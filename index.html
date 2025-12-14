@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joy Generator Password</title>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #000;
+            background-image: url('GDLN.jpg');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 47%;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Layout */
+        .container-wrapper {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            width: 100%;
+            max-width: 1300px;
+            flex-wrap: wrap;
+        }
+
+        .main-container, .tools-container {
+            flex: 1;
+            min-width: 400px;
+            max-width: 600px;
+            padding: 30px;
+            background: rgba(30, 30, 30, 0.9);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Corner Decorations */
+        .main-container .corner-bottom, .tools-container .corner-bottom {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            bottom: 10px;
+            left: 10px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            border-left: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .main-container .corner-bottom-right, .tools-container .corner-bottom-right {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            bottom: 10px;
+            right: 10px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            border-right: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        .main-container .corner-top, .tools-container .corner-top {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 10px;
+            left: 10px;
+            border-top: 2px solid rgba(255,255,255,0.1);
+            border-left: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .main-container .corner-top-right, .tools-container .corner-top-right {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 10px;
+            right: 10px;
+            border-top: 2px solid rgba(255,255,255,0.1);
+            border-right: 2px solid rgba(255,255,255,0.1);
+        }
+        /* Typography */
+        h3 {
+            text-align: center;
+            color: #fff;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+
+        h4 {
+            color: #fff;
+            margin-bottom: 10px;
+            margin-top: 0;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 15px;
+            color: #bdbdbd;
+            font-size: 14px;
+        }
+
+        /* Form Elements */
+        input[type="text"], select, input[type="file"] {
+            width: 100%;
+            margin-top: 8px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background-color: #1a1a1a;
+            color: white;
+            font-size: 16px;
+        }
+
+        /* Buttons */
+        button, .copy-phone-btn, #copyOcrBtn {
+            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+            color: #00be39;
+            padding: 12px 24px;
+            border: 1px solid #555;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        #generateBtn, #copyButton {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        #generateBtn:hover, #copyButton:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(255, 255, 255, 0.25);
+            opacity: 0.95;
+        }
+
+        #generateBtn:active, #copyButton:active {
+            transform: translateY(1px) scale(0.97);
+            box-shadow: 0 2px 6px rgba(0, 255, 150, 0.18);
+            opacity: 0.85;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+
+        /* Results */
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(25, 25, 25, 0.85);
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            line-height: 1.6;
+            border: 1px solid #333;
+            position: relative;
+            max-height: 200px;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .phone-result, .count-result {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(35, 35, 35, 0.85);
+            border-radius: 6px;
+            font-family: monospace;
+            min-height: 30px;
+            position: relative;
+        }
+
+        #copyPhoneBtn {
+            position: absolute;
+            top: 4px;
+            right: 8px;
+            padding: 5px 10px;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.12);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: none;
+        }
+
+        #copyPhoneBtn:hover {
+            background: rgba(255, 255, 255, 0.22);
+        }
+
+        /* OCR Styles */
+        .ocr-area {
+            border: 2px dashed rgba(255, 255, 255, 0.25);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 8px;
+        }
+
+        .ocr-result-box {
+            width: 100%;
+            margin-top: 8px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background-color: #1a1a1a;
+            color: #888;
+            font-size: 16px;
+            position: relative;
+            min-height: 44px;
+            line-height: 1.3;
+        }
+
+        #copyOcrBtn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 5px 10px;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.12);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: none;
+        }
+
+        #copyOcrBtn:hover {
+            background: rgba(255, 255, 255, 0.22);
+        }
+
+        #ocrResult {
+            pointer-events: auto;
+            padding: 12px;
+            background: rgba(30, 30, 30, 0.85);
+            border-radius: 6px;
+            min-height: 60px;
+            color: #e0e0e0;
+            text-align: center;
+            font-size: 14px;
+            outline: none;
+        }
+
+        #previewContainer {
+            margin-top: 10px;
+            text-align: center;
+            max-height: 200px;
+            overflow: hidden;
+            display: none;
+        }
+
+        #imagePreview {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+
+        /* Validation Displays */
+        #countDisplay {
+            margin-top: 10px;
+            color: #bdbdbd;
+            font-size: 14px;
+        }
+
+        #matchDisplay {
+            margin-top: 5px;
+            padding: 8px;
+            background: rgba(0, 255, 120, 0.15);
+            border: 1px solid rgba(0, 255, 120, 0.35);
+            border-radius: 6px;
+            color: #00ff9d;
+            display: none;
+            font-size: 14px;
+        }
+
+        #mismatchDisplay {
+            margin-top: 5px;
+            padding: 8px;
+            background: rgba(255, 80, 80, 0.15);
+            border: 1px solid rgba(255, 80, 80, 0.35);
+            border-radius: 6px;
+            color: #ff7070;
+            display: none;
+            font-size: 14px;
+        }
+
+        #differenceExplanation {
+            margin-top: 5px;
+            color: #ffc266;
+            display: none;
+            font-size: 13px;
+        }
+
+        /* Donation Section */
+        #donationSection {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: rgba(25, 25, 25, 0.8);
+            border-radius: 8px;
+            text-align: center;
+            color: #bdbdbd;
+            border: 1px solid #333;
+        }
+
+        #donationSection a {
+            text-decoration: none;
+            color: #ffd700;
+            font-weight: bold;
+            margin-top: 10px;
+            display: inline-block;
+            padding: 8px 16px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 5px;
+            transition: all 0.2s ease;
+        }
+
+        #donationSection a:hover {
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+            transform: translateY(-2px);
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(40, 40, 40, 0.95);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        /* Loading Spinner */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="toast" id="toast"></div>
+
+    <div class="container-wrapper">
+        <!-- MAIN CONTAINER -->
+        <div class="main-container">
+            <div class="corner-bottom"></div>
+            <div class="corner-bottom-right"></div>
+            <div class="corner-top"></div>
+            <div class="corner-top-right"></div>
+            <h3>Generator Password</h3>
+            <label for="userId">User ID / Username:</label>
+            <input type="text" id="userId" placeholder="Masukkan User ID Anda" />
+            <div class="button-container">
+                <button id="generateBtn">Generate Password</button>
+                <button id="copyButton" disabled>Salin Password</button>
+            </div>
+            <div id="result"><img src="GDLN.jpg" alt="Placeholder Image" style="max-width: 100%; max-height: 200px; object-fit: contain;"></div>            <div class="button-container" style="margin-top: 15px;">
+                <a href="rotatepicture.html" style="text-decoration: none;">
+                    <button style="background: linear-gradient(145deg, #2a2a2a, #1a1a1a); color: #00be39; padding: 10px 20px; border: 1px solid #555; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; box-shadow: 0 4px 8px rgba(0,0,0,0.4); transition: all 0.2s ease;">Rotate Picture Tool</button>
+                </a>
+            </div>            <div id="donationSection">
+                <p>Terima kasih telah menggunakan aplikasi kami! 🎉</p>
+                <p>© 2024 JOY - All Rights Reserved</p>
+                <a href="https://saweria.co/joyfulme" target="_blank">Donasi Sekarang</a>
+            </div>
+        </div>
+
+        <!-- TOOLS CONTAINER -->
+        <div class="tools-container">
+            <div class="corner-bottom"></div>
+            <div class="corner-bottom-right"></div>
+            <div class="corner-top"></div>
+            <div class="corner-top-right"></div>
+            <h3>Alat Bantu Tambahan</h3>
+
+            <!-- Number Filter -->
+            <div class="phone-section">
+                <label for="phoneInput">Input Teks:</label>
+                <input type="text" id="phoneInput" placeholder="Contoh: 0812 2654 2414 / BCA48784124" />
+                <div class="phone-result" id="phoneResult">
+                    <div id="phoneDisplay">Hasil filter (hanya angka) akan muncul di sini</div>
+                    <button class="copy-phone-btn" id="copyPhoneBtn">Salin</button>
+                </div>
+            </div>
+
+            <!-- Character Validator -->
+            <div class="character-count-section">
+                <label for="originalText">Teks Asli (Nama Lengkap):</label>
+                <input type="text" id="originalText" placeholder="Contoh: DJOHANDOE MALDINI" />
+
+                <label for="maskedText">Hasil Validasi:</label>
+                <input type="text" id="maskedText" placeholder="Contoh: DJOXXXXXX MALXXXX" />
+            </div>
+
+            <!-- HASIL VALIDATOR -->
+            <div id="countDisplay">Menunggu input...</div>
+
+            <div id="matchDisplay">✔ Jumlah karakter sesuai!</div>
+
+            <div id="mismatchDisplay">✖ Jumlah karakter tidak sama!</div>
+
+            <div id="differenceExplanation"></div>
+
+            <!-- OCR Section -->
+            <div class="ocr-section">
+                <h4>OCR (Optical Character Recognition) 🖼️</h4>
+
+                <label for="imageUpload">1. Pilih File Gambar:</label>
+                <input type="file" id="imageUpload" accept="image/*" />
+
+                <label for="ocrResult">2. Area Paste Gambar:</label>
+                <div class="ocr-area">
+                    <div id="ocrResult">
+                        Tekan Ctrl+V (Windows) / Cmd+V (Mac)
+                    </div>
+                </div>
+
+                <div id="previewContainer">
+                    <img id="imagePreview" alt="Preview" />
+                </div>
+
+                <button id="resetOCR"
+                  style="margin-top:10px; width:100%; padding:5px; background:#222;
+                  border:1px solid #444; color:#ddd; border-radius:6px; cursor:pointer;">
+                Reset OCR
+                </button>
+
+                <!-- OUTPUT OCR -->
+                <div id="ocrOutput" class="ocr-result-box">
+                    <button id="copyOcrBtn">Salin</button>
+                    <div id="ocrDisplayResult">Hasil teks OCR akan muncul di sini.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Utility Functions
+        function showToast(msg, duration = 3000) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), duration);
+        }
+
+        // Number Filter
+        const phoneInput = document.getElementById('phoneInput');
+        const phoneDisplay = document.getElementById('phoneDisplay');
+        const copyPhoneBtn = document.getElementById('copyPhoneBtn');
+
+        phoneInput.addEventListener('input', () => {
+            const clean = phoneInput.value.replace(/\D/g, '');
+            phoneDisplay.textContent = clean || 'Hasil filter akan muncul di sini';
+            copyPhoneBtn.style.display = clean ? 'block' : 'none';
+        });
+
+        copyPhoneBtn.addEventListener('click', () => {
+            const clean = phoneInput.value.replace(/\D/g, '');
+            if (!clean) {
+                showToast('Tidak ada angka untuk disalin!');
+                return;
+            }
+            navigator.clipboard.writeText(clean).then(() => showToast('Angka berhasil disalin!'));
+        });
+
+        // Password Generator
+        const letters = 'abcdefghjkmnoprstuvwxyz';
+        const numbers = '0123456789';
+        const blacklist = [
+            // Kategori makian 1
+            'kon', 'ppk', 'pep', 'pek', 'ppq', 'mem', 'mek', 'mmk', 'bjg', 'fck', 'tod', 'tot', 'ewe', 'cuk',
+            // Kategori makian 2
+            'eek', 'eeq', 'bdh', 'cpt', 'wtf', 'kmk', 'bdt', 'knt', 'pck', 'jbt', 'gob', 'cog', 'cok', 'ccb', 'cot', 'bac',
+            // Kategori makian 3
+            'fuk', 'puk', 'tah', 'cib', 'tok',
+            // Kategori mesum
+            'wot', 'spg', 'spn', 'ttk', 'cro', 'ken', 'tit', 'wet', 'mot',
+            // Kategori hewan
+            'hwn', 'ajg', 'anj', 'njg', 'asu', 'asw', 'bab', 'pig', 'dog',
+            // Kategori hinaan
+            'psk', 'beb', 'bot', 'pms', 'vms', 'odg', 'mat',
+            // Kategori 5
+            'bye', 'woi', 'ini', 'nah', 'itu', 'nih', 'boy', 'end', 'gbs', 'dek',
+            // Kategori lain-lain
+            'png', 'idn', 'hkb', 'ipk', 'kps', 'smb',
+        ];
+
+        function generatePassword() {
+            let pwd = '';
+            function hasConsecutiveNumbers(p) {
+                for (let i = 1; i < p.length; i++) {
+                    if (!isNaN(p[i]) && p[i] === p[i - 1]) return true;
+                }
+                return false;
+            }
+            do {
+                pwd = '';
+                for (let i = 0; i < 3; i++) pwd += letters[Math.floor(Math.random() * letters.length)];
+                for (let i = 0; i < 3; i++) pwd += numbers[Math.floor(Math.random() * numbers.length)];
+            } while (blacklist.some(w => pwd.includes(w)) || hasConsecutiveNumbers(pwd));
+            return pwd;
+        }
+
+        document.getElementById('userId').addEventListener('keypress', e => {
+            if (e.key === 'Enter') document.getElementById('generateBtn').click();
+        });
+
+        document.getElementById('generateBtn').addEventListener('click', () => {
+            const userId = document.getElementById('userId').value;
+            if (!userId) {
+                showToast('Harap masukkan User ID!');
+                return;
+            }
+            const password = generatePassword();
+            const output = `Berikut user id dan password baru Anda Bosku:\nUser ID: ${userId.toLowerCase()}\nPassword: ${password}\n\nSilakan dicoba login bosku.\nNote: Saran kami disimpan pada memo anda dan setelah berhasil login mohon untuk mengganti password anda kembali.`;
+            document.getElementById('result').innerText = output;
+            document.getElementById('copyButton').style.display = 'block';
+            document.getElementById('copyButton').disabled = false;
+            showToast('Password berhasil digenerate!');
+        });
+
+        document.getElementById('copyButton').addEventListener('click', () => {
+            if (document.getElementById('copyButton').disabled) {
+                showToast('Belum ada password untuk disalin!');
+                return;
+            }
+            const text = document.getElementById('result').innerText;
+            if (!text || text === 'Klik "Generate Password" untuk mendapatkan hasil.') {
+                showToast('Belum ada password untuk disalin!');
+                return;
+            }
+            navigator.clipboard.writeText(text).then(() => showToast('Password berhasil disalin!'));
+        });
+
+        // Character Validator
+        const originalText = document.getElementById('originalText');
+        const maskedText = document.getElementById('maskedText');
+        const countDisplay = document.getElementById('countDisplay');
+        const matchDisplay = document.getElementById('matchDisplay');
+        const mismatchDisplay = document.getElementById('mismatchDisplay');
+        const differenceExplanation = document.getElementById('differenceExplanation');
+
+        function validateCharacterCount() {
+            const original = originalText.value;
+            const masked = maskedText.value;
+            countDisplay.textContent = `Jumlah karakter: ${masked.replace(/\s/g, '').length} dari ${original.replace(/\s/g, '').length}`;
+            if (original.replace(/\s/g, '').length === masked.replace(/\s/g, '').length) {
+                matchDisplay.style.display = 'block';
+                mismatchDisplay.style.display = 'none';
+                differenceExplanation.style.display = 'none';
+            } else {
+                matchDisplay.style.display = 'none';
+                mismatchDisplay.style.display = 'block';
+                differenceExplanation.style.display = 'block';
+                differenceExplanation.textContent = 'Perbedaan jumlah karakter antara teks asli dan hasil masking.';
+            }
+        }
+
+        originalText.addEventListener('input', validateCharacterCount);
+        maskedText.addEventListener('input', validateCharacterCount);
+
+        // OCR
+        const imageUpload = document.getElementById('imageUpload');
+        const previewContainer = document.getElementById('previewContainer');
+        const imagePreview = document.getElementById('imagePreview');
+        const ocrResult = document.getElementById('ocrResult');
+        const ocrOutput = document.getElementById('ocrOutput');
+        const ocrDisplayResult = document.getElementById('ocrDisplayResult');
+        const copyOcrBtn = document.getElementById('copyOcrBtn');
+
+        // Upload
+        imageUpload.addEventListener('change', () => {
+            const file = imageUpload.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                imagePreview.src = e.target.result;
+                previewContainer.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+            runOCR(file);
+        });
+
+        // Paste
+        ocrResult.addEventListener('paste', async e => {
+            const items = e.clipboardData.items;
+            for (const item of items) {
+                if (item.type.indexOf('image') === 0) {
+                    const file = item.getAsFile();
+                    imagePreview.src = URL.createObjectURL(file);
+                    previewContainer.style.display = 'block';
+                    runOCR(file);
+                }
+            }
+        });
+
+        // Run OCR
+        async function runOCR(file) {
+            ocrDisplayResult.textContent = 'Memproses...';
+            const worker = await Tesseract.createWorker();
+            await worker.load();
+            await worker.loadLanguage('eng');
+            await worker.initialize('eng');
+            const { data: { text } } = await worker.recognize(file);
+            await worker.terminate();
+            ocrDisplayResult.textContent = text.trim() || '(Tidak ada teks terdeteksi)';
+            ocrDisplayResult.style.color = "#00ff15";
+            copyOcrBtn.style.display = "block";
+            ocrOutput.style.display = "block";
+        }
+
+        // Copy OCR
+        copyOcrBtn.addEventListener('click', () => {
+            const text = ocrDisplayResult.textContent.trim();
+            if (!text || text.includes('Hasil teks OCR')) {
+                showToast('Belum ada hasil OCR!');
+                return;
+            }
+            navigator.clipboard.writeText(text).then(() => showToast('Hasil OCR berhasil disalin!'));
+        });
+
+        // Reset OCR
+        const resetBtn = document.getElementById('resetOCR');
+        resetBtn.addEventListener('click', () => {
+            const ocrResult = document.getElementById('ocrResult');
+            const ocrDisplayResult = document.getElementById('ocrDisplayResult');
+            const ocrOutput = document.getElementById('ocrOutput');
+            const copyOcrBtn = document.getElementById('copyOcrBtn');
+            const imagePreview = document.getElementById('imagePreview');
+            const previewContainer = document.getElementById('previewContainer');
+            const imageUpload = document.getElementById('imageUpload');
+
+            // Reset text area and status
+            if (ocrResult) ocrResult.textContent = "Tekan Ctrl+V (Windows) / Cmd+V (Mac)";
+            if (ocrDisplayResult) {
+                ocrDisplayResult.textContent = "Hasil teks OCR akan muncul di sini.";
+                ocrDisplayResult.style.color = "#888";
+            }
+
+            // Hide container and copy button
+            if (copyOcrBtn) copyOcrBtn.style.display = "none";
+            if (ocrOutput) ocrOutput.style.display = "none";
+
+            // Clear preview image
+            if (imagePreview) imagePreview.src = "";
+            if (previewContainer) previewContainer.style.display = "none";
+
+            // Reset file input
+            if (imageUpload) imageUpload.value = "";
+
+            // Feedback
+            showToast("OCR berhasil di-reset.");
+        });
+    </script>
+</body>
+</html>

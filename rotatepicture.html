@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotate Picture - Joy Tools</title>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #000;
+            background-image: url('GDLN.jpg');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 47%;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Layout */
+        .container-wrapper {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            width: 100%;
+            max-width: 1300px;
+            flex-wrap: wrap;
+        }
+
+        .main-container {
+            flex: 1;
+            min-width: 400px;
+            max-width: 800px;
+            padding: 30px;
+            background: rgba(30, 30, 30, 0.9);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            gap: 20px;
+        }
+
+        .controls {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .preview-area {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px;
+            border: 1px solid #444;
+            border-radius: 8px;
+            background: rgba(25, 25, 25, 0.5);
+        }
+
+        /* Corner Decorations */
+        .main-container .corner-bottom {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            bottom: 10px;
+            left: 10px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            border-left: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .main-container .corner-bottom-right {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            bottom: 10px;
+            right: 10px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            border-right: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .main-container .corner-top {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 10px;
+            left: 10px;
+            border-top: 2px solid rgba(255, 255, 255, 0.1);
+            border-left: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .main-container .corner-top-right {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 10px;
+            right: 10px;
+            border-top: 2px solid rgba(255, 255, 255, 0.1);
+            border-right: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Typography */
+        h3 {
+            text-align: center;
+            color: #fff;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 15px;
+            color: #bdbdbd;
+            font-size: 14px;
+        }
+
+        /* Form Elements */
+        input[type="file"] {
+            width: 100%;
+            margin-top: 8px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background-color: #1a1a1a;
+            color: white;
+            font-size: 16px;
+        }
+
+        /* Buttons */
+        button {
+            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+            color: #00be39;
+            padding: 12px 24px;
+            border: 1px solid #555;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(255, 255, 255, 0.25);
+            opacity: 0.95;
+        }
+
+        button:active {
+            transform: translateY(1px) scale(0.97);
+            box-shadow: 0 2px 6px rgba(0, 255, 150, 0.18);
+            opacity: 0.85;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+
+        /* Image Preview */
+        #imagePreview {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+            border: 1px solid #444;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(40, 40, 40, 0.95);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="toast" id="toast"></div>
+
+    <div class="container-wrapper">
+        <div class="main-container">
+            <div class="corner-bottom"></div>
+            <div class="corner-bottom-right"></div>
+            <div class="corner-top"></div>
+            <div class="corner-top-right"></div>
+
+            <div class="controls">
+                <div class="button-container" style="margin-bottom: 20px;">
+                    <a href="index.html" style="text-decoration: none;">
+                        <button style="background: linear-gradient(145deg, #2a2a2a, #1a1a1a); color: #00be39; padding: 10px 20px; border: 1px solid #555; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; box-shadow: 0 4px 8px rgba(0,0,0,0.4); transition: all 0.2s ease;">Back to Generator</button>
+                    </a>
+                </div>
+                <h3>Rotate Picture</h3>
+                <label for="imageUpload">Pilih Gambar:</label>
+                <input type="file" id="imageUpload" accept="image/*" />
+
+                <label for="pasteArea">Atau Paste Gambar dari Clipboard:</label>
+                <div id="pasteArea" style="border: 2px dashed rgba(255,255,255,0.25); padding: 20px; border-radius: 8px; text-align: center; color: #bdbdbd; cursor: pointer; margin-top: 8px;">Klik di sini dan tekan Ctrl+V (Windows) / Cmd+V (Mac) untuk paste gambar</div>
+
+                <div class="button-container">
+                    <button id="rotateLeft">Rotate Left</button>
+                    <button id="rotateRight">Rotate Right</button>
+                    <button id="downloadBtn" style="display: none;">Download</button>
+                </div>
+            </div>
+
+            <div class="preview-area">
+                <img id="imagePreview" alt="Preview Gambar" style="max-width: 100%; max-height: 100%; object-fit: contain; display: none;" />
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentRotation = 0;
+        let originalImage = null;
+
+        function showToast(msg, duration = 3000) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), duration);
+        }
+
+        const imageUpload = document.getElementById('imageUpload');
+        const imagePreview = document.getElementById('imagePreview');
+        const pasteArea = document.getElementById('pasteArea');
+        const rotateLeftBtn = document.getElementById('rotateLeft');
+        const rotateRightBtn = document.getElementById('rotateRight');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        imageUpload.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                loadImage(file);
+            }
+        });
+
+        pasteArea.addEventListener('paste', (e) => {
+            const items = e.clipboardData.items;
+            for (const item of items) {
+                if (item.type.indexOf('image') === 0) {
+                    const file = item.getAsFile();
+                    loadImage(file);
+                    break;
+                }
+            }
+        });
+
+        function loadImage(file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                originalImage = new Image();
+                originalImage.onload = () => {
+                    currentRotation = 0;
+                    drawImage();
+                    imagePreview.style.display = 'block';
+                    downloadBtn.style.display = 'inline-block';
+                    showToast('Gambar berhasil dimuat!');
+                };
+                originalImage.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function drawImage() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const { width, height } = originalImage;
+
+            if (currentRotation % 180 === 0) {
+                canvas.width = width;
+                canvas.height = height;
+            } else {
+                canvas.width = height;
+                canvas.height = width;
+            }
+
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            ctx.rotate((currentRotation * Math.PI) / 180);
+            ctx.drawImage(originalImage, -width / 2, -height / 2);
+
+            imagePreview.src = canvas.toDataURL();
+        }
+
+        rotateLeftBtn.addEventListener('click', () => {
+            if (!originalImage) {
+                showToast('Pilih gambar dulu!');
+                return;
+            }
+            currentRotation -= 90;
+            drawImage();
+            showToast('Rotated left!');
+        });
+
+        rotateRightBtn.addEventListener('click', () => {
+            if (!originalImage) {
+                showToast('Pilih gambar dulu!');
+                return;
+            }
+            currentRotation += 90;
+            drawImage();
+            showToast('Rotated right!');
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            if (!originalImage) return;
+            const link = document.createElement('a');
+            link.download = 'rotated_image.png';
+            link.href = imagePreview.src;
+            link.click();
+            showToast('Gambar berhasil didownload!');
+        });
+    </script>
+</body>
+</html>
