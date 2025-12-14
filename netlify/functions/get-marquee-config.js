@@ -1,7 +1,7 @@
 // netlify/functions/get-marquee-config.js
 
 // URL Mentah (Raw URL) Gist Anda yang asli
-const GIST_URL = 'https://gist.githubusercontent.com/asaphtech/e4373cf3233824c721f6640818b88bfe/raw/c29dd163f92065f96cbf49007cdaab1116a46ee2/config.json';
+const GIST_URL = 'https://gist.githubusercontent.com/asaphtech/e4373cf3233824c721f6640818b88bfe/raw/afaa8c976b5f018a85097249484d9aec9d2b1099/config.json';
 
 exports.handler = async function(event, context) {
     try {
