@@ -3,40 +3,35 @@
 document.addEventListener('DOMContentLoaded', () => {
     const runningTextElement = document.getElementById('runningText');
 
-    // URL GIST ANDA YANG SUDAH BENAR
+    // PASTI BANTU DENGAN URL GIST ANDA YANG AKURAT
     const GLOBAL_CONFIG_URL = 'https://gist.githubusercontent.com/asaphtech/e4373cf3233824c721f6640818b88bfe/raw/c29dd163f92065f96cbf49007cdaab1116a46ee2/config.json';
     
-    // Kunci untuk Local Storage
     const STORAGE_KEY = 'customMarqueeText';
-    
-    // Teks darurat (hanya digunakan jika fetch Gist gagal total)
     const fallbackText = '📢 ERROR: GAGAL MEMUAT PESAN SERVER. MENGGUNAKAN PESAN DARURAT.';
 
-
-    // FUNGSI UNTUK MEMUAT TEKS DARI LOCAL STORAGE ATAU SERVER GIST
+    // FUNGSI INI KINI MENGGUNAKAN ASYNC/AWAIT UNTUK FETCH DATA DARI GIST
     async function loadMarqueeText() {
         const storedLocalText = localStorage.getItem(STORAGE_KEY);
         
-        // PRIORITAS 1: Jika ada teks yang disimpan pengguna secara lokal, gunakan itu.
+        // PRIORITAS 1: Teks Lokal Pengguna
         if (storedLocalText) {
             if (runningTextElement) {
                 runningTextElement.textContent = storedLocalText;
             }
-            return; // Hentikan fungsi
+            return; 
         }
 
-        // PRIORITAS 2: Jika tidak ada teks lokal, ambil pesan global dari Gist
+        // PRIORITAS 2: Ambil pesan Global dari Gist
         try {
             const response = await fetch(GLOBAL_CONFIG_URL);
             
-            // Cek apakah fetch berhasil (status code 200-299)
             if (!response.ok) {
                 throw new Error('Gagal memuat Gist. Status: ' + response.status);
             }
             
             const config = await response.json();
             
-            // Ambil pesan dari properti "marqueeText" di JSON Gist
+            // Ambil pesan dari properti "marqueeText"
             const serverDefaultText = config.marqueeText || fallbackText;
 
             if (runningTextElement) {
@@ -73,8 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Inisialisasi
-    // Panggil fungsi yang baru
+    // Inisialisasi: Panggil fungsi yang baru
     loadMarqueeText(); 
     setupMarqueeControls();
 });
