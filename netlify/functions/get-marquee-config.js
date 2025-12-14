@@ -1,39 +1,65 @@
-// netlify/functions/get-marquee-config.js
+// marquee-config.js - VERSI FINAL DENGAN KONTROL GIST GLOBAL
 
-// URL Gist Dinamis Anda (tanpa HASH)
-const BASE_GIST_URL = 'https://gist.githubusercontent.com/asaphtech/e4373cf3233824c721f6640818b88bfe/raw/config.json';
+document.addEventListener('DOMContentLoaded', () => {
+    const runningTextElement = document.getElementById('runningText');
 
-exports.handler = async function(event, context) {
-    try {
-        // Tambahkan parameter cache-busting unik (timestamp) ke URL
-        const cacheBuster = Date.now();
-        const GIST_URL_WITH_BYPASS = `${BASE_GIST_URL}?t=${cacheBuster}`;
+    // URL Netlify Function untuk mengambil data Gist
+    const GLOBAL_CONFIG_URL = '/.netlify/functions/get-marquee-config';
+    
+    // Teks darurat jika Netlify Function/Gist gagal
+    const fallbackText = '📢 ERROR: GAGAL MEMUAT PESAN GLOBAL DARI SERVER. HUBUNGI ADMIN JIKA INI TERUS TERJADI.';
 
-        // 1. Ambil data dari GitHub Gist (menggunakan URL cache-busting)
-        const response = await fetch(GIST_URL_WITH_BYPASS);
-        
-        if (!response.ok) {
-            // Jika Gist gagal diakses (meskipun cache-busting), gunakan pesan darurat
-            throw new Error(`Gagal fetch Gist: ${response.status}`);
+    // FUNGSI UTAMA: Ambil pesan Global dari Gist
+    async function loadMarqueeText() {
+        try {
+            const response = await fetch(GLOBAL_CONFIG_URL);
+            
+            if (!response.ok) {
+                console.warn('Gagal memuat Gist. Status:', response.status);
+                throw new Error('Response not OK'); 
+            }
+            
+            const config = await response.json();
+            
+            // Ambil pesan dari properti "marqueeText" (Default: fallbackText)
+            const serverDefaultText = config.marqueeText || fallbackText;
+
+            if (runningTextElement) {
+                runningTextElement.textContent = serverDefaultText;
+            }
+            
+        } catch (error) {
+            console.error("Error loading configuration from Gist:", error);
+            // Gunakan teks darurat jika Gist gagal diakses
+            if (runningTextElement) {
+                runningTextElement.textContent = fallbackText;
+            }
         }
-
-        const data = await response.json();
-
-        // 2. Kembalikan data ke klien (browser)
-        return {
-            statusCode: 200,
-            headers: { 
-                "Content-Type": "application/json",
-                // Set cache control untuk Function Netlify ini agar responsnya cepat
-                "Cache-Control": "public, max-age=60" // Cache 60 detik saja
-            },
-            body: JSON.stringify(data)
-        };
-    } catch (error) {
-        console.error("Error fetching Gist:", error.message);
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ marqueeText: "📢 Gagal memuat data terbaru (Cek Console)." })
-        };
     }
-}
+
+    // Fungsi untuk menghentikan/melanjutkan Marquee (Logika Double-Click)
+    function setupMarqueeControls() {
+        if (runningTextElement) {
+            runningTextElement.addEventListener('dblclick', function() {
+                const currentState = window.getComputedStyle(this).getPropertyValue('animation-play-state');
+                
+                if (currentState === 'running') {
+                    this.style.animationPlayState = 'paused';
+                    // Fungsi showToast didefinisikan di rotatepicture.html atau index.html
+                    if (typeof showToast === 'function') {
+                        showToast('Marquee berhenti (Double-Click untuk lanjut).', 3000);
+                    }
+                } else {
+                    this.style.animationPlayState = 'running';
+                    if (typeof showToast === 'function') {
+                        showToast('Marquee berjalan lagi!', 3000);
+                    }
+                }
+            });
+        }
+    }
+
+    // Inisialisasi
+    loadMarqueeText(); 
+    setupMarqueeControls();
+});
