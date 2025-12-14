@@ -1,0 +1,38 @@
+/* marquee.css */
+.marquee-container {
+    width: 100%;
+    overflow: hidden;
+    background: linear-gradient(90deg, #0f1115, #1c1c1c);
+    padding: 20px 0 12px 0;
+    border-bottom: 2px solid #ffffff33;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    min-height: 40px;
+}
+
+#runningText {
+    display: inline-block;
+    white-space: nowrap;
+    font-size: 18px;
+    font-weight: bold;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    letter-spacing: 1px;
+    color: #ffffff;
+    padding-left: 100%;
+    animation: marqueeAnimation 20s linear infinite;
+    transform: translateY(4px);
+    cursor: pointer; /* Tambahkan ini agar pengguna tahu elemen ini bisa diklik */
+}
+
+@keyframes marqueeAnimation {
+    0% {
+        transform: translateX(0) translateY(4px);
+    }
+
+    100% {
+        transform: translateX(-100%) translateY(4px);
+    }
+}

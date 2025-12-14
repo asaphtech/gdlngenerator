@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Joy Generator Password</title>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <link rel="stylesheet" href="marquee.css">
     <style>
+        /* [Kode CSS Anda tetap sama di sini] */
         /* Reset and Base Styles */
         * {
             margin: 0;
@@ -380,8 +382,11 @@
 <body>
     <div class="toast" id="toast"></div>
 
+    <div class="marquee-container">
+        <div id="runningText">Selamat datang di Joy Generator Password</div>
+    </div>
+
     <div class="container-wrapper">
-        <!-- MAIN CONTAINER -->
         <div class="main-container">
             <div class="corner-bottom"></div>
             <div class="corner-bottom-right"></div>
@@ -394,18 +399,20 @@
                 <button id="generateBtn">Generate Password</button>
                 <button id="copyButton" disabled>Salin Password</button>
             </div>
-            <div id="result"><img src="GDLN.jpg" alt="Placeholder Image" style="max-width: 100%; max-height: 200px; object-fit: contain;"></div>            <div class="button-container" style="margin-top: 15px;">
+            <div id="result">Klik "Generate Password" untuk mendapatkan hasil.</div> 
+            
+            <div class="button-container" style="margin-top: 15px;">
                 <a href="rotatepicture.html" style="text-decoration: none;">
                     <button style="background: linear-gradient(145deg, #2a2a2a, #1a1a1a); color: #00be39; padding: 10px 20px; border: 1px solid #555; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; box-shadow: 0 4px 8px rgba(0,0,0,0.4); transition: all 0.2s ease;">Rotate Picture Tool</button>
                 </a>
-            </div>            <div id="donationSection">
+            </div>
+            <div id="donationSection">
                 <p>Terima kasih telah menggunakan aplikasi kami! 🎉</p>
                 <p>© 2024 JOY - All Rights Reserved</p>
                 <a href="https://saweria.co/joyfulme" target="_blank">Donasi Sekarang</a>
             </div>
         </div>
 
-        <!-- TOOLS CONTAINER -->
         <div class="tools-container">
             <div class="corner-bottom"></div>
             <div class="corner-bottom-right"></div>
@@ -413,7 +420,6 @@
             <div class="corner-top-right"></div>
             <h3>Alat Bantu Tambahan</h3>
 
-            <!-- Number Filter -->
             <div class="phone-section">
                 <label for="phoneInput">Input Teks:</label>
                 <input type="text" id="phoneInput" placeholder="Contoh: 0812 2654 2414 / BCA48784124" />
@@ -423,7 +429,6 @@
                 </div>
             </div>
 
-            <!-- Character Validator -->
             <div class="character-count-section">
                 <label for="originalText">Teks Asli (Nama Lengkap):</label>
                 <input type="text" id="originalText" placeholder="Contoh: DJOHANDOE MALDINI" />
@@ -432,16 +437,11 @@
                 <input type="text" id="maskedText" placeholder="Contoh: DJOXXXXXX MALXXXX" />
             </div>
 
-            <!-- HASIL VALIDATOR -->
             <div id="countDisplay">Menunggu input...</div>
-
             <div id="matchDisplay">✔ Jumlah karakter sesuai!</div>
-
             <div id="mismatchDisplay">✖ Jumlah karakter tidak sama!</div>
-
             <div id="differenceExplanation"></div>
 
-            <!-- OCR Section -->
             <div class="ocr-section">
                 <h4>OCR (Optical Character Recognition) 🖼️</h4>
 
@@ -465,8 +465,7 @@
                 Reset OCR
                 </button>
 
-                <!-- OUTPUT OCR -->
-                <div id="ocrOutput" class="ocr-result-box">
+                <div id="ocrOutput" class="ocr-result-box" style="display: none;">
                     <button id="copyOcrBtn">Salin</button>
                     <div id="ocrDisplayResult">Hasil teks OCR akan muncul di sini.</div>
                 </div>
@@ -475,7 +474,7 @@
     </div>
 
     <script>
-        // Utility Functions
+        // Utility Functions (DIPERLUKAN OLEH marquee-config.js)
         function showToast(msg, duration = 3000) {
             const t = document.getElementById('toast');
             t.textContent = msg;
@@ -692,5 +691,6 @@
             showToast("OCR berhasil di-reset.");
         });
     </script>
+    <script src="marquee-config.js"></script>
 </body>
 </html>
