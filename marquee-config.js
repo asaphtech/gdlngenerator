@@ -2,6 +2,8 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     const runningTextElement = document.getElementById('runningText');
+
+    const GLOBAL_CONFIG_URL = 'https://gist.githubusercontent.com/asaphtech/e4373cf3233824c721f6640818b88bfe/raw/c29dd163f92065f96cbf49007cdaab1116a46ee2/config.json';
     
     // Kunci untuk Local Storage
     const STORAGE_KEY = 'customMarqueeText';
