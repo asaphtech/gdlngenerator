@@ -1,5 +1,13 @@
 // marquee-config.js
 
+// ====================================================================
+// START GUARDRAIL (PENTING untuk mencegah ReferenceError di Netlify Function)
+if (typeof document === 'undefined') {
+    return; // Berhenti jika dijalankan di lingkungan Server/Node.js
+}
+// END GUARDRAIL
+// ====================================================================
+
 document.addEventListener('DOMContentLoaded', () => {
     const runningTextElement = document.getElementById('runningText');
 
@@ -21,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return; 
         }
 
-        // PRIORITAS 2: Ambil pesan Global dari Gist
+        // PRIORITAS 2: Ambil pesan Global dari Gist (via Netlify Function)
         try {
             const response = await fetch(GLOBAL_CONFIG_URL);
             
