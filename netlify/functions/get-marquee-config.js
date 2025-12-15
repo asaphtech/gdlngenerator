@@ -3,7 +3,7 @@
 const fetch = require('node-fetch');
 
 // PASTI URL RAW GIST Anda di sini!
-const GIST_RAW_URL = 'https://gist.githubusercontent.com/asaphtech/e4373cf3233824c721f6640818b88bfe/raw/d7e2b3548afe793f1e5c0c37c497615f5ba7b2b1/config.json'; 
+const GIST_RAW_URL = 'https://gist.githubusercontent.com/asaphtech/7b27d3a606a1c732c47874772211b822/raw/e0a3869d84ee2aa7e7610516979aaa1d6f94fe34/config.json'; 
 
 exports.handler = async (event) => {
     try {
