@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // PRIORITAS 1: Teks Lokal Pengguna
         if (storedLocalText) {
             if (runningTextElement) {
-                runningTextElement.textContent = storedLocalText + ' ' + storedLocalText;
+                runningTextElement.textContent = storedLocalText;
             }
             return;
         }
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const serverDefaultText = config.marqueeText || fallbackText;
 
             if (runningTextElement) {
-                runningTextElement.textContent = serverDefaultText + ' ' + serverDefaultText;
+                runningTextElement.textContent = serverDefaultText;
             }
             
         } catch (error) {
