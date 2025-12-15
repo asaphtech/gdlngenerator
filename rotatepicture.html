@@ -254,8 +254,15 @@
       <button id="rotateLeftBtn" disabled>Rotate ⬅️ 90°</button>
       <button id="rotateRightBtn" disabled>Rotate ➡️ 90°</button>
      </div>
-     
-     <label style="margin-top: 25px;">3. Aksi Akhir:</label>
+
+     <label>3. Kontrol Zoom:</label>
+     <div class="button-container">
+      <button id="zoomInBtn" disabled>Zoom In 🔍+</button>
+      <button id="zoomOutBtn" disabled>Zoom Out 🔍-</button>
+      <button id="resetZoomBtn" disabled>Reset Zoom</button>
+     </div>
+
+     <label style="margin-top: 25px;">4. Aksi Akhir:</label>
      <div class="button-container">
       <button id="copyImageBtn" disabled>Salin Gambar</button>
       <button id="downloadBtn" disabled>Unduh Gambar</button>
@@ -289,6 +296,9 @@
   const imageUpload = document.getElementById('imageUpload');
   const rotateLeftBtn = document.getElementById('rotateLeftBtn');
   const rotateRightBtn = document.getElementById('rotateRightBtn');
+  const zoomInBtn = document.getElementById('zoomInBtn');
+  const zoomOutBtn = document.getElementById('zoomOutBtn');
+  const resetZoomBtn = document.getElementById('resetZoomBtn');
   const copyImageBtn = document.getElementById('copyImageBtn');
   const downloadBtn = document.getElementById('downloadBtn');
   const previewCanvas = document.getElementById('previewCanvas');
@@ -297,10 +307,14 @@
 
   let originalImage = new Image();
   let rotationAngle = 0; // Sudut rotasi saat ini dalam derajat
+  let zoomFactor = 1.0; // Faktor zoom saat ini
 
   function enableButtons(enabled) {
    rotateLeftBtn.disabled = !enabled;
    rotateRightBtn.disabled = !enabled;
+   zoomInBtn.disabled = !enabled;
+   zoomOutBtn.disabled = !enabled;
+   resetZoomBtn.disabled = !enabled;
    copyImageBtn.disabled = !enabled;
    downloadBtn.disabled = !enabled;
   }
@@ -331,8 +345,8 @@
 
    let scale = (maxCanvasSize - 20) / maxImageSize; // Margin 20px
    
-   displayWidth = imgWidth * scale;
-   displayHeight = imgHeight * scale;
+   displayWidth = imgWidth * scale * zoomFactor;
+   displayHeight = imgHeight * scale * zoomFactor;
 
    // Gambar gambar dari pusat yang dirotasi
    ctx.drawImage(originalImage, -displayWidth / 2, -displayHeight / 2, displayWidth, displayHeight);
@@ -353,6 +367,7 @@
    
    originalImage = img;
    rotationAngle = 0;
+   zoomFactor = 1.0;
    previewCanvas.style.display = 'block';
    initialMessage.style.display = 'none';
    enableButtons(true);
@@ -419,9 +434,36 @@
     if (rotationAngle === 90 || rotationAngle === 270) {
      [previewCanvas.width, previewCanvas.height] = [previewCanvas.height, previewCanvas.width];
     }
-    
+
     drawImage();
     showToast(`Rotasi: ${rotationAngle}°`);
+   }
+  });
+
+  // Event: Zoom In
+  zoomInBtn.addEventListener('click', () => {
+   if (originalImage.src) {
+    zoomFactor = Math.min(zoomFactor * 1.2, 5.0);
+    drawImage();
+    showToast(`Zoom: ${(zoomFactor * 100).toFixed(0)}%`);
+   }
+  });
+
+  // Event: Zoom Out
+  zoomOutBtn.addEventListener('click', () => {
+   if (originalImage.src) {
+    zoomFactor = Math.max(zoomFactor / 1.2, 0.1);
+    drawImage();
+    showToast(`Zoom: ${(zoomFactor * 100).toFixed(0)}%`);
+   }
+  });
+
+  // Event: Reset Zoom
+  resetZoomBtn.addEventListener('click', () => {
+   if (originalImage.src) {
+    zoomFactor = 1.0;
+    drawImage();
+    showToast("Zoom direset ke 100%");
    }
   });
 

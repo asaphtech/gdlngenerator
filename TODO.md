@@ -1,0 +1,9 @@
+- [ ] Add zoomFactor variable (default 1.0) in JS script
+- [ ] Insert zoom controls (Zoom In, Zoom Out, Reset Zoom buttons) in HTML controls section
+- [ ] Modify drawImage() to apply zoomFactor to displayWidth and displayHeight
+- [ ] Add event listeners for zoom buttons to adjust zoomFactor (clamp 0.1-5.0)
+- [ ] Update enableButtons() to include zoom buttons
+- [ ] Show toast messages for zoom actions
+- [ ] Ensure download/copy remain at original size
+- [ ] Test zoom with rotation and preview updates
+- [ ] Push changes to git repository
