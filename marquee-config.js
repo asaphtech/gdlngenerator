@@ -1,13 +1,5 @@
 // marquee-config.js
 
-// ====================================================================
-// START GUARDRAIL (PENTING untuk mencegah ReferenceError di Netlify Function)
-if (typeof document === 'undefined') {
-    return; // Berhenti jika dijalankan di lingkungan Server/Node.js
-}
-// END GUARDRAIL
-// ====================================================================
-
 document.addEventListener('DOMContentLoaded', () => {
     const runningTextElement = document.getElementById('runningText');
 
