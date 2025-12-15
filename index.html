@@ -184,6 +184,7 @@
             overflow: hidden;
             text-align: center;
             color: #e0e0e0;
+            min-height: 50px;
         }
 
         #result.generated {
@@ -560,7 +561,12 @@
             }
             const password = generatePassword();
             const output = `Berikut user id dan password baru Anda Bosku:\nUser ID: ${userId.toLowerCase()}\nPassword: ${password}\n\nSilakan dicoba login bosku.\nNote: Saran kami disimpan pada memo anda dan setelah berhasil login mohon untuk mengganti password anda kembali.`;
-            document.getElementById('result').innerText = output;
+            const resultElement = document.getElementById('result');
+            resultElement.innerText = output;
+            resultElement.style.textAlign = 'left';
+
+            resultElement.classList.remove('generated');
+
             document.getElementById('copyButton').style.display = 'block';
             document.getElementById('copyButton').disabled = false;
             showToast('Password berhasil digenerate!');
