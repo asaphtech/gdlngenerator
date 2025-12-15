@@ -24,9 +24,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // PRIORITAS 1: Teks Lokal Pengguna
         if (storedLocalText) {
             if (runningTextElement) {
-                runningTextElement.textContent = storedLocalText;
+                runningTextElement.textContent = storedLocalText + ' ' + storedLocalText;
             }
-            return; 
+            return;
         }
 
         // PRIORITAS 2: Ambil pesan Global dari Gist (via Netlify Function)
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const serverDefaultText = config.marqueeText || fallbackText;
 
             if (runningTextElement) {
-                runningTextElement.textContent = serverDefaultText;
+                runningTextElement.textContent = serverDefaultText + ' ' + serverDefaultText;
             }
             
         } catch (error) {

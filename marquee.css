@@ -21,15 +21,14 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     letter-spacing: 1px;
     color: #ffffff;
-    padding-left: 100%;
     animation: marqueeAnimation 20s linear infinite;
-    transform: translateY(4px);
+    transform: translateX(100%) translateY(4px);
     cursor: pointer; /* Tambahkan ini agar pengguna tahu elemen ini bisa diklik */
 }
 
 @keyframes marqueeAnimation {
     0% {
-        transform: translateX(0) translateY(4px);
+        transform: translateX(100%) translateY(4px);
     }
 
     100% {
