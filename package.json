@@ -1,0 +1,8 @@
+{
+  "name": "generator-password-app",
+  "version": "1.0.0",
+  "description": "Password Generator with Netlify Function",
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  }
+}
