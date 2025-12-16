@@ -22,13 +22,12 @@
     letter-spacing: 1px;
     color: #ffffff;
     animation: marqueeAnimation 20s linear infinite;
-    transform: translateX(100%) translateY(4px);
     cursor: pointer; /* Tambahkan ini agar pengguna tahu elemen ini bisa diklik */
 }
 
 @keyframes marqueeAnimation {
     0% {
-        transform: translateX(100%) translateY(4px);
+        transform: translateX(100vw) translateY(4px);
     }
 
     100% {
