@@ -36,14 +36,14 @@
    justify-content: center;
    gap: 30px;
    width: 100%;
-   max-width: 1300px;
+   max-width: 1400px; /* Lebarkan container wrapper */
    flex-wrap: wrap;
   }
 
   .main-container {
    flex: 1;
-   min-width: 400px;
-   max-width: 800px;
+   min-width: 800px;
+   max-width: 1200px; /* Lebarkan main container */
    padding: 30px;
    background: rgba(30, 30, 30, 0.9);
    border-radius: 20px;
@@ -52,32 +52,37 @@
    position: relative;
    overflow: hidden;
    display: flex;
-   flex-direction: column; /* Mengubah menjadi kolom untuk tata letak yang lebih baik */
+   flex-direction: column;
    gap: 20px;
   }
 
   .content-area {
    display: flex;
-   gap: 20px;
-   flex-wrap: wrap;
+   gap: 30px; /* Jarak antara kontrol dan preview */
+   flex-wrap: nowrap; /* Pastikan kontrol dan preview sejajar */
   }
 
   .controls {
-   flex: 1;
-   min-width: 250px;
+   flex-basis: 300px; /* Lebar tetap untuk kontrol */
+   min-width: 280px;
+   order: 1; /* Kontrol di sebelah kiri */
+   display: flex;
+   flex-direction: column;
+   gap: 15px; /* Jarak antar grup kontrol */
   }
 
   .preview-area {
-   flex: 1.5; /* Memberikan ruang lebih untuk preview */
+   flex-grow: 1; /* Memberikan ruang maksimum untuk preview */
    display: flex;
    flex-direction: column;
    justify-content: center;
    align-items: center;
-   min-height: 300px;
+   min-height: 450px; /* Tingkatkan tinggi minimum */
    border: 1px solid #444;
    border-radius: 8px;
    background: rgba(25, 25, 25, 0.5);
    padding: 10px;
+   order: 2; /* Preview di sebelah kanan */
   }
 
   /* Corner Decorations */
@@ -133,11 +138,13 @@
   label {
    font-weight: bold;
    display: block;
-   margin-top: 15px;
+   margin-top: 10px; /* Kurangi margin atas label */
    color: #bdbdbd;
    font-size: 14px;
+   padding-bottom: 5px;
+   border-bottom: 1px dashed #333;
   }
-
+  
   /* Form Elements */
   input[type="file"] {
    width: 100%;
@@ -154,16 +161,18 @@
   button {
    background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
    color: #00be39;
-   padding: 12px 24px;
+   padding: 12px 15px; /* Sesuaikan padding tombol */
    border: 1px solid #555;
    border-radius: 8px;
    cursor: pointer;
-   font-size: 15px;
+   font-size: 14px; /* Sesuaikan ukuran font tombol */
    font-weight: 600;
-   letter-spacing: 1px;
+   letter-spacing: 0.5px;
    text-transform: uppercase;
    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
    transition: all 0.2s ease;
+   flex-grow: 1;
+   min-width: 100px; /* Tambahkan min-width */
   }
 
   button:disabled {
@@ -188,16 +197,32 @@
 
   .button-container {
    display: flex;
-   justify-content: center;
-   gap: 15px;
-   margin-top: 25px;
+   justify-content: space-between;
+   gap: 10px; /* Kurangi jarak antar tombol */
+   margin-top: 10px;
    flex-wrap: wrap;
+  }
+  
+  /* Tombol Khusus Kembali */
+  .back-button-container {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px dashed #333;
+      text-align: center;
+  }
+  
+  .back-button-container button {
+      padding: 10px 20px; 
+      font-size: 14px;
+      min-width: 200px;
+      background: linear-gradient(145deg, #2a2a2a, #1a1a1a); 
+      color: #00be39; 
   }
 
   /* Image Preview */
   #previewCanvas {
    max-width: 100%;
-   max-height: 400px;
+   max-height: 550px; /* Tingkatkan batas maksimum canvas */
    border-radius: 8px;
    border: 2px dashed #00be39;
    display: none; /* Disembunyikan sampai gambar dimuat */
@@ -211,7 +236,7 @@
 
   /* Toast (Fixed Bug) */
   .toast {
-      position: fixed;
+    position: fixed;
    bottom: 20px;
    left: 50%;
    transform: translateX(-50%);
@@ -225,7 +250,7 @@
   }
 
   .toast.show {
-   opacity: 1; /* PERBAIKAN: Nilai opacity ditambahkan */
+   opacity: 1;
   }
  </style>
 </head>
@@ -242,62 +267,66 @@
    <div class="corner-bottom-right"></div>
    <div class="corner-top"></div>
    <div class="corner-top-right"></div>
-   <h3>Alat Rotasi Gambar (Preview)</h3>
+   <h3>Alat Rotasi Gambar (Preview Lebih Besar)</h3>
 
    <div class="content-area">
-    <div class="controls">
-     <label for="imageUpload">1. Pilih File Gambar:</label>
-     <input type="file" id="imageUpload" accept="image/*" />
-
-     <label>2. Kontrol Rotasi:</label>
-     <div class="button-container">
-      <button id="rotateLeftBtn" disabled>Rotate ⬅️ 90°</button>
-      <button id="rotateRightBtn" disabled>Rotate ➡️ 90°</button>
-     </div>
-
-     <label>3. Kontrol Zoom:</label>
-     <div class="button-container">
-      <button id="zoomInBtn" disabled>Zoom In 🔍+</button>
-      <button id="zoomOutBtn" disabled>Zoom Out 🔍-</button>
-      <button id="resetZoomBtn" disabled>Reset Zoom</button>
-     </div>
-
-     <label style="margin-top: 25px;">4. Aksi Akhir:</label>
-     <div class="button-container">
-      <button id="copyImageBtn" disabled>Salin Gambar</button>
-      <button id="downloadBtn" disabled>Unduh Gambar</button>
-     </div>
-
-     <div class="button-container">
-      <a href="index.html" style="text-decoration: none;">
-       <button style="background: linear-gradient(145deg, #2a2a2a, #1a1a1a); color: #00be39; padding: 10px 20px; border: 1px solid #555; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; box-shadow: 0 4px 8px rgba(0,0,0,0.4); transition: all 0.2s ease;">Kembali ke Generator</button>
-      </a>
-     </div>
-    </div>
 
     <div class="preview-area">
-     <canvas id="previewCanvas" width="400" height="400"></canvas>
-     <p id="initialMessage">Silakan pilih atau *paste* gambar untuk memulai rotasi.</p>
+      <canvas id="previewCanvas" width="400" height="400"></canvas>
+      <p id="initialMessage">Silakan pilih atau *paste* gambar untuk memulai rotasi.</p>
+    </div>
+    
+    <div class="controls">
+      
+      <label for="imageUpload">1. Pilih File Gambar:</label>
+      <input type="file" id="imageUpload" accept="image/*" />
+
+      <label>2. Kontrol Rotasi (90°):</label>
+      <div class="button-container">
+        <button id="rotateLeftBtn" disabled>Rotate ⬅️</button>
+        <button id="rotateRightBtn" disabled>Rotate ➡️</button>
+      </div>
+
+      <label>3. Kontrol Zoom (Tampilan Preview):</label>
+      <div class="button-container">
+        <button id="zoomOutBtn" disabled>Zoom Out 🔍-</button>
+        <button id="zoomInBtn" disabled>Zoom In 🔍+</button>
+      </div>
+      <div class="button-container">
+        <button id="resetZoomBtn" disabled>Reset Zoom</button>
+      </div>
+
+      <label>4. Aksi Akhir (Output Resolusi Penuh):</label>
+      <div class="button-container">
+        <button id="copyImageBtn" disabled>Salin Gambar</button>
+        <button id="downloadBtn" disabled>Unduh Gambar</button>
+      </div>
+
+      <div class="back-button-container">
+        <a href="index.html" style="text-decoration: none;">
+          <button>Kembali ke Generator</button>
+        </a>
+      </div>
     </div>
    </div>
   </div>
- </div>  
+ </div> 
 
  <script>
   // --- 1. UTILITY FUNCTIONS (DIPERLUKAN OLEH marquee-config.js) ---
   function showToast(msg, duration = 3000) {
-   const t = document.getElementById('toast');
-   t.textContent = msg;
-   t.classList.add('show');
-   setTimeout(() => t.classList.remove('show'), duration);
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), duration);
   }
 
   // --- 2. ROTATE PICTURE LOGIC ---
   const imageUpload = document.getElementById('imageUpload');
   const rotateLeftBtn = document.getElementById('rotateLeftBtn');
   const rotateRightBtn = document.getElementById('rotateRightBtn');
-  const zoomInBtn = document.getElementById('zoomInBtn');
   const zoomOutBtn = document.getElementById('zoomOutBtn');
+  const zoomInBtn = document.getElementById('zoomInBtn');
   const resetZoomBtn = document.getElementById('resetZoomBtn');
   const copyImageBtn = document.getElementById('copyImageBtn');
   const downloadBtn = document.getElementById('downloadBtn');
@@ -308,251 +337,253 @@
   let originalImage = new Image();
   let rotationAngle = 0; // Sudut rotasi saat ini dalam derajat
   let zoomFactor = 1.0; // Faktor zoom saat ini
+  
+  // Variabel untuk menyimpan rasio scaling awal
+  let initialScaleRatio = 1.0; 
 
   function enableButtons(enabled) {
-   rotateLeftBtn.disabled = !enabled;
-   rotateRightBtn.disabled = !enabled;
-   zoomInBtn.disabled = !enabled;
-   zoomOutBtn.disabled = !enabled;
-   resetZoomBtn.disabled = !enabled;
-   copyImageBtn.disabled = !enabled;
-   downloadBtn.disabled = !enabled;
+    rotateLeftBtn.disabled = !enabled;
+    rotateRightBtn.disabled = !enabled;
+    zoomInBtn.disabled = !enabled;
+    zoomOutBtn.disabled = !enabled;
+    resetZoomBtn.disabled = !enabled;
+    copyImageBtn.disabled = !enabled;
+    downloadBtn.disabled = !enabled;
   }
 
   function drawImage() {
-   if (!originalImage.src) return;
+    if (!originalImage.src) return;
 
-   const canvasWidth = previewCanvas.width;
-   const canvasHeight = previewCanvas.height;
-   const imgWidth = originalImage.width;
-   const imgHeight = originalImage.height;
+    const canvasWidth = previewCanvas.width;
+    const canvasHeight = previewCanvas.height;
+    const imgWidth = originalImage.width;
+    const imgHeight = originalImage.height;
 
-   // Clear canvas
-   ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+    // Clear canvas
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-   ctx.save();
-   // Pindahkan titik pusat ke tengah canvas
-   ctx.translate(canvasWidth / 2, canvasHeight / 2);
-   // Terapkan rotasi
-   ctx.rotate(rotationAngle * Math.PI / 180);
-   
-   // Skala sederhana (mempertahankan aspek rasio):
-   let displayWidth = imgWidth;
-   let displayHeight = imgHeight;
-   
-   let maxCanvasSize = Math.min(canvasWidth, canvasHeight);
-   let maxImageSize = Math.max(imgWidth, imgHeight);
+    ctx.save();
+    // Pindahkan titik pusat ke tengah canvas
+    ctx.translate(canvasWidth / 2, canvasHeight / 2);
+    // Terapkan rotasi
+    ctx.rotate(rotationAngle * Math.PI / 180);
+    
+    // Tentukan dimensi gambar yang akan ditampilkan setelah scaling awal dan zoom
+    let displayWidth = imgWidth * initialScaleRatio * zoomFactor;
+    let displayHeight = imgHeight * initialScaleRatio * zoomFactor;
 
-   let scale = (maxCanvasSize - 20) / maxImageSize; // Margin 20px
-   
-   displayWidth = imgWidth * scale * zoomFactor;
-   displayHeight = imgHeight * scale * zoomFactor;
-
-   // Gambar gambar dari pusat yang dirotasi
-   ctx.drawImage(originalImage, -displayWidth / 2, -displayHeight / 2, displayWidth, displayHeight);
-   ctx.restore();
+    // Gambar gambar dari pusat yang dirotasi
+    ctx.drawImage(originalImage, -displayWidth / 2, -displayHeight / 2, displayWidth, displayHeight);
+    ctx.restore();
   }
   
   function setupCanvasForImage(img) {
-   // Menentukan dimensi maksimum di area pratinjau
-   const maxWidth = 500;
-   const maxHeight = 500;
-   
-   // Menghitung rasio untuk fit dalam area pratinjau
-   const ratio = Math.min(maxWidth / img.width, maxHeight / img.height);
-   
-   // Set dimensi canvas sesuai dimensi yang di-scale (untuk gambar asli)
-   previewCanvas.width = img.width * ratio;
-   previewCanvas.height = img.height * ratio;
-   
-   originalImage = img;
-   rotationAngle = 0;
-   zoomFactor = 1.0;
-   previewCanvas.style.display = 'block';
-   initialMessage.style.display = 'none';
-   enableButtons(true);
-   drawImage();
-   showToast("Gambar berhasil dimuat. Siap untuk dirotasi.");
+    // Menentukan dimensi maksimum di area pratinjau (sesuai CSS baru)
+    const maxWidth = 550; 
+    const maxHeight = 550;
+    
+    // Menghitung rasio untuk fit dalam area pratinjau
+    const ratio = Math.min(maxWidth / img.width, maxHeight / img.height);
+    
+    // Set dimensi canvas
+    previewCanvas.width = img.width * ratio;
+    previewCanvas.height = img.height * ratio;
+    
+    originalImage = img;
+    initialScaleRatio = ratio; // Simpan rasio awal
+    rotationAngle = 0; // Reset rotasi
+    zoomFactor = 1.0; // Reset zoom
+    
+    previewCanvas.style.display = 'block';
+    initialMessage.style.display = 'none';
+    enableButtons(true);
+    drawImage();
+    showToast("Gambar berhasil dimuat. Siap untuk dirotasi.");
   }
 
   // Event: Pilih File
   imageUpload.addEventListener('change', (e) => {
-   const file = e.target.files[0];
-   if (!file) return;
+    const file = e.target.files[0];
+    if (!file) return;
 
-   const reader = new FileReader();
-   reader.onload = (e) => {
-    const img = new Image();
-    img.onload = () => setupCanvasForImage(img);
-    img.src = e.target.result;
-   };
-   reader.readAsDataURL(file);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+     const img = new Image();
+     img.onload = () => setupCanvasForImage(img);
+     img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
   });
 
   // Event: Paste Gambar
   document.addEventListener('paste', (e) => {
-   const items = e.clipboardData.items;
-   for (const item of items) {
-    if (item.type.indexOf('image') === 0) {
-     const file = item.getAsFile();
-     const reader = new FileReader();
-     reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => setupCanvasForImage(img);
-      img.src = e.target.result;
-     };
-     reader.readAsDataURL(file);
-     e.preventDefault(); // Mencegah paste ke elemen lain jika ada
-     return;
+    const items = e.clipboardData.items;
+    for (const item of items) {
+     if (item.type.indexOf('image') === 0) {
+      const file = item.getAsFile();
+      const reader = new FileReader();
+      reader.onload = (e) => {
+       const img = new Image();
+       img.onload = () => setupCanvasForImage(img);
+       img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+      e.preventDefault();
+      return;
+     }
     }
-   }
   });
   
   // Event: Rotate Kiri (Counter-Clockwise)
   rotateLeftBtn.addEventListener('click', () => {
-   if (originalImage.src) {
-    rotationAngle -= 90;
-    if (rotationAngle < 0) rotationAngle += 360;
-    
-    // Logika penyesuaian dimensi canvas saat rotasi 90/270
-    if (rotationAngle === 90 || rotationAngle === 270 || rotationAngle === -90 || rotationAngle === -270) {
-     [previewCanvas.width, previewCanvas.height] = [previewCanvas.height, previewCanvas.width];
+    if (originalImage.src) {
+     rotationAngle -= 90;
+     if (rotationAngle < 0) rotationAngle += 360;
+     
+     // Logika penyesuaian dimensi canvas saat rotasi 90/270
+     // Cek apakah sudut baru adalah 90 atau 270 (mod 180 !== 0)
+     if (rotationAngle % 180 !== 0 && previewCanvas.width === originalImage.width * initialScaleRatio) {
+        // Hanya tukar jika transisi dari 0/180 ke 90/270
+        [previewCanvas.width, previewCanvas.height] = [previewCanvas.height, previewCanvas.width];
+     } else if (rotationAngle % 180 === 0 && previewCanvas.width === originalImage.height * initialScaleRatio) {
+        // Tukar kembali jika transisi dari 90/270 ke 0/180
+        [previewCanvas.width, previewCanvas.height] = [previewCanvas.height, previewCanvas.width];
+     }
+     
+     drawImage();
+     showToast(`Rotasi: ${rotationAngle}°`);
     }
-    
-    drawImage();
-    showToast(`Rotasi: ${rotationAngle}°`);
-   }
   });
 
   // Event: Rotate Kanan (Clockwise)
   rotateRightBtn.addEventListener('click', () => {
-   if (originalImage.src) {
-    rotationAngle += 90;
-    if (rotationAngle >= 360) rotationAngle -= 360;
+    if (originalImage.src) {
+     rotationAngle += 90;
+     if (rotationAngle >= 360) rotationAngle -= 360;
 
-    // Logika penyesuaian dimensi canvas saat rotasi 90/270
-    if (rotationAngle === 90 || rotationAngle === 270) {
-     [previewCanvas.width, previewCanvas.height] = [previewCanvas.height, previewCanvas.width];
+     // Logika penyesuaian dimensi canvas saat rotasi 90/270
+     // Cek apakah sudut baru adalah 90 atau 270 (mod 180 !== 0)
+     if (rotationAngle % 180 !== 0 && previewCanvas.width === originalImage.width * initialScaleRatio) {
+        // Hanya tukar jika transisi dari 0/180 ke 90/270
+        [previewCanvas.width, previewCanvas.height] = [previewCanvas.height, previewCanvas.width];
+     } else if (rotationAngle % 180 === 0 && previewCanvas.width === originalImage.height * initialScaleRatio) {
+        // Tukar kembali jika transisi dari 90/270 ke 0/180
+        [previewCanvas.width, previewCanvas.height] = [previewCanvas.height, previewCanvas.width];
+     }
+
+     drawImage();
+     showToast(`Rotasi: ${rotationAngle}°`);
     }
-
-    drawImage();
-    showToast(`Rotasi: ${rotationAngle}°`);
-   }
   });
 
   // Event: Zoom In
   zoomInBtn.addEventListener('click', () => {
-   if (originalImage.src) {
-    zoomFactor = Math.min(zoomFactor * 1.2, 5.0);
-    drawImage();
-    showToast(`Zoom: ${(zoomFactor * 100).toFixed(0)}%`);
-   }
+    if (originalImage.src) {
+     zoomFactor = Math.min(zoomFactor * 1.2, 5.0);
+     drawImage();
+     showToast(`Zoom: ${(zoomFactor * 100).toFixed(0)}%`);
+    }
   });
 
   // Event: Zoom Out
   zoomOutBtn.addEventListener('click', () => {
-   if (originalImage.src) {
-    zoomFactor = Math.max(zoomFactor / 1.2, 0.1);
-    drawImage();
-    showToast(`Zoom: ${(zoomFactor * 100).toFixed(0)}%`);
-   }
+    if (originalImage.src) {
+     zoomFactor = Math.max(zoomFactor / 1.2, 0.1);
+     drawImage();
+     showToast(`Zoom: ${(zoomFactor * 100).toFixed(0)}%`);
+    }
   });
 
   // Event: Reset Zoom
   resetZoomBtn.addEventListener('click', () => {
-   if (originalImage.src) {
-    zoomFactor = 1.0;
-    drawImage();
-    showToast("Zoom direset ke 100%");
-   }
+    if (originalImage.src) {
+     zoomFactor = 1.0;
+     drawImage();
+     showToast("Zoom direset ke 100%");
+    }
   });
 
-  // Event: Unduh Gambar
+  // Event: Unduh Gambar (Menggunakan canvas resolusi penuh)
   downloadBtn.addEventListener('click', () => {
-   if (originalImage.src) {
-    // Membuat canvas sementara dengan ukuran gambar asli (bukan ukuran preview) 
-    const tempCanvas = document.createElement('canvas');
-    const tempCtx = tempCanvas.getContext('2d');
-    
-    const isRotated = (rotationAngle % 180 !== 0);
-    
-    if (isRotated) {
-     tempCanvas.width = originalImage.height;
-     tempCanvas.height = originalImage.width;
-    } else {
-     tempCanvas.width = originalImage.width;
-     tempCanvas.height = originalImage.height;
+    if (originalImage.src) {
+     const tempCanvas = document.createElement('canvas');
+     const tempCtx = tempCanvas.getContext('2d');
+     
+     const isRotated = (rotationAngle % 180 !== 0);
+     
+     if (isRotated) {
+      tempCanvas.width = originalImage.height;
+      tempCanvas.height = originalImage.width;
+     } else {
+      tempCanvas.width = originalImage.width;
+      tempCanvas.height = originalImage.height;
+     }
+
+     tempCtx.save();
+     tempCtx.translate(tempCanvas.width / 2, tempCanvas.height / 2);
+     tempCtx.rotate(rotationAngle * Math.PI / 180);
+     
+     const drawWidth = originalImage.width;
+     const drawHeight = originalImage.height;
+     
+     tempCtx.drawImage(originalImage, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
+     tempCtx.restore();
+
+     const dataURL = tempCanvas.toDataURL('image/png');
+     const link = document.createElement('a');
+     link.download = `rotated_image_${rotationAngle}deg.png`;
+     link.href = dataURL;
+     document.body.appendChild(link);
+     link.click();
+     document.body.removeChild(link);
+     showToast("Gambar berhasil diunduh.");
     }
-
-    tempCtx.save();
-    tempCtx.translate(tempCanvas.width / 2, tempCanvas.height / 2);
-    tempCtx.rotate(rotationAngle * Math.PI / 180);
-    
-    const drawWidth = originalImage.width;
-    const drawHeight = originalImage.height;
-    
-    // Gambarkan gambar asli tanpa skala
-    tempCtx.drawImage(originalImage, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
-    tempCtx.restore();
-
-    // Unduh dari canvas sementara
-    const dataURL = tempCanvas.toDataURL('image/png');
-    const link = document.createElement('a');
-    link.download = `rotated_image_${rotationAngle}deg.png`;
-    link.href = dataURL;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    showToast("Gambar berhasil diunduh.");
-   }
   });
 
-  // Event: Salin Gambar ke Clipboard
+  // Event: Salin Gambar ke Clipboard (Menggunakan canvas resolusi penuh)
   copyImageBtn.addEventListener('click', () => {
-   if (originalImage.src) {
-    // Membuat canvas sementara dengan ukuran gambar asli
-    const tempCanvas = document.createElement('canvas');
-    const tempCtx = tempCanvas.getContext('2d');
-    
-    const isRotated = (rotationAngle % 180 !== 0);
-    
-    if (isRotated) {
-     tempCanvas.width = originalImage.height;
-     tempCanvas.height = originalImage.width;
-    } else {
-     tempCanvas.width = originalImage.width;
-     tempCanvas.height = originalImage.height;
-    }
-
-    tempCtx.save();
-    tempCtx.translate(tempCanvas.width / 2, tempCanvas.height / 2);
-    tempCtx.rotate(rotationAngle * Math.PI / 180);
-    tempCtx.drawImage(originalImage, -originalImage.width / 2, -originalImage.height / 2, originalImage.width, originalImage.height);
-    tempCtx.restore();
-
-    // Konversi canvas menjadi Blob (data gambar)
-    tempCanvas.toBlob(blob => {
-     if (blob) {
-      try {
-       const item = new ClipboardItem({ [blob.type]: blob });
-       navigator.clipboard.write([item]).then(() => {
-        showToast("Gambar yang dirotasi berhasil disalin ke clipboard!");
-       }).catch(err => {
-        console.error('Gagal menyalin gambar:', err);
-        showToast("Gagal menyalin gambar. Pastikan browser Anda mendukung API ini.");
-       });
-      } catch (e) {
-       console.error('Clipboard API error:', e);
-       showToast("Gagal menyalin. Mungkin browser tidak mendukung Clipboard API. Coba tombol Unduh.");
-      }
+    if (originalImage.src) {
+     const tempCanvas = document.createElement('canvas');
+     const tempCtx = tempCanvas.getContext('2d');
+     
+     const isRotated = (rotationAngle % 180 !== 0);
+     
+     if (isRotated) {
+      tempCanvas.width = originalImage.height;
+      tempCanvas.height = originalImage.width;
+     } else {
+      tempCanvas.width = originalImage.width;
+      tempCanvas.height = originalImage.height;
      }
-    }, 'image/png'); // Pilih format output
-   }
+
+     tempCtx.save();
+     tempCtx.translate(tempCanvas.width / 2, tempCanvas.height / 2);
+     tempCtx.rotate(rotationAngle * Math.PI / 180);
+     tempCtx.drawImage(originalImage, -originalImage.width / 2, -originalImage.height / 2, originalImage.width, originalImage.height);
+     tempCtx.restore();
+
+     tempCanvas.toBlob(blob => {
+      if (blob) {
+       try {
+        const item = new ClipboardItem({ [blob.type]: blob });
+        navigator.clipboard.write([item]).then(() => {
+         showToast("Gambar yang dirotasi berhasil disalin ke clipboard!");
+        }).catch(err => {
+         console.error('Gagal menyalin gambar:', err);
+         showToast("Gagal menyalin gambar. Pastikan browser Anda mendukung API ini.");
+        });
+       } catch (e) {
+        console.error('Clipboard API error:', e);
+        showToast("Gagal menyalin. Mungkin browser tidak mendukung Clipboard API. Coba tombol Unduh.");
+       }
+      }
+     }, 'image/png');
+    }
   });
   
   // Inisialisasi awal
   enableButtons(false);
  </script>
-  <script src="marquee-config.js"></script>
+ <script src="marquee-config.js"></script>
 </body>
 </html>
