@@ -1,16 +1,16 @@
 {
-  "short_name": "Joy Gen",
   "name": "Joy Generator Password",
+  "short_name": "Joy Gen",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
   "icons": [
     {
-      "src": "JFN NEW.png",
+      "src": "icon.png",
       "sizes": "1024x1024",
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ],
-  "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#000000"
+  ]
 }
