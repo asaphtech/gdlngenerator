@@ -9,6 +9,7 @@
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" type="image/png" href="/icon.png">
     <link rel="apple-touch-icon" href="/icon.png">
+    <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <style>
         /* [Kode CSS Anda tetap sama di sini] */
         /* Reset and Base Styles */
@@ -398,6 +399,11 @@
         <div id="runningText"></div>
     </div>
 
+    <div style="text-align: right; padding: 10px; max-width: 1300px; margin: 0 auto; width: 100%;">
+    <div id="user-info" style="color: #00be39; margin-bottom: 5px; font-weight: bold;"></div>
+    <div data-netlify-identity-button></div>
+    </div>
+
     <div class="container-wrapper">
         <div class="main-container">
             <div class="corner-bottom"></div>
@@ -712,6 +718,38 @@
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js');
                 });
+        }
+
+        // Inisialisasi Netlify Identity
+        const identity = window.netlifyIdentity;
+
+        identity.on('init', user => {
+            if (!user) {
+                // Jika belum login, sembunyikan container utama atau beri peringatan
+                document.querySelector('.container-wrapper').style.opacity = '0.3';
+                document.querySelector('.container-wrapper').style.pointerEvents = 'none';
+                document.getElementById('user-info').textContent = "Silakan Login untuk menggunakan alat.";
+            }
+        });
+
+        identity.on('login', user => {
+            // Saat login berhasil
+                document.querySelector('.container-wrapper').style.opacity = '1';
+                document.querySelector('.container-wrapper').style.pointerEvents = 'auto';
+                document.getElementById('user-info').textContent = `Halo, ${user.user_metadata.full_name || user.email}`;
+                identity.close(); // Tutup modal setelah login
+        });
+
+        identity.on('logout', () => {
+            // Saat logout
+            location.reload(); // Refresh halaman untuk mengunci kembali
+        });
+
+        if (window.location.hash) {
+            window.parent.postMessage({
+                type: 'netlify-identity-confirm',
+                hash: window.location.hash
+            }, window.location.origin);
         }
     </script>
     <script src="marquee-config.js"></script>
