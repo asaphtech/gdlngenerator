@@ -6,6 +6,7 @@
     <title>Joy Generator Password</title>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <link rel="stylesheet" href="marquee.css">
+    <link rel="manifest" href="/manifest.json">
     <style>
         /* [Kode CSS Anda tetap sama di sini] */
         /* Reset and Base Styles */
@@ -704,6 +705,12 @@
             // Feedback
             showToast("OCR berhasil di-reset.");
         });
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js');
+                });
+        }
     </script>
     <script src="marquee-config.js"></script>
 </body>
