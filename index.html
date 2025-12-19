@@ -449,6 +449,59 @@
             max-width: 600px;
         }
 
+        .header-profile {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            padding: 10px 20px;
+            background: #000;
+            position: relative;
+            z-index: 1001;
+        }
+
+        .profile-container {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            font-size: 14px;
+            position: relative;
+            background: #1a1a1a;
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 1px solid #333;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 45px;
+            right: 0;
+            background: #1a1a1a;
+            min-width: 180px;
+            border: 1px solid #00be39;
+            border-radius: 8px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+            z-index: 1002;
+            padding: 10px;
+        }
+
+        .dropdown-content.show {
+            display: block;
+        }
+
+        .logout-link {
+            width: 100%;
+            background: transparent;
+            color: #ff4d4d;
+            border: none;
+            text-align: left;
+            padding: 10px 0;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
         @keyframes spin {
             to {
                 transform: rotate(360deg);
@@ -479,6 +532,19 @@
             <button id="main-login-btn" class="btn-auth" style="padding: 12px 30px; width: 100%;">
                 KLIK UNTUK LOGIN
             </button>
+        </div>
+    </div>
+
+    <div class="header-profile">
+        <div class="profile-container" onclick="toggleProfileMenu()">
+            <span id="user-email-display">Guest Mode</span>
+            <div class="profile-icon">👤</div>
+
+            <div id="profile-dropdown" class="dropdown-content">
+                <p id="user-info-detail"></p>
+                <hr>
+                <button id="auth-btn" class="logout-link">Login</button>
+            </div>
         </div>
     </div>
 
@@ -798,6 +864,51 @@
             // Feedback
             showToast("OCR berhasil di-reset.");
         });
+
+        function toggleProfileMenu() {
+            const dropdown = document.getElementById('profile-dropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Tutup dropdown jika klik di luar area profil
+        window.onclick = function(event) {
+            if (!event.target.closest('.profile-container')) {
+                const dropdowns = document.getElementsByClassName("dropdown-content");
+                for (let i = 0; i < dropdowns.length; i++) {
+                    dropdowns[i].classList.remove('show');
+                }
+            }
+        }
+
+        // Update Fungsi Tampilan
+        function updateUI(user) {
+            const userDetail = document.getElementById('user-info-detail');
+
+            if (user) {
+                mainApp.style.display = 'flex';
+                guestView.style.display = 'none';
+
+                userEmailDisp.textContent = user.email;
+                userDetail.textContent = `Email: ${user.email}`;
+                authBtn.textContent = 'Logout';
+                authBtn.style.color = '#ff4d4d';
+
+        // Pastikan layout tools tetap rapi
+        const wrapper = document.querySelector('.container-wrapper');
+        if (wrapper) {
+            wrapper.style.display = 'flex';
+            wrapper.style.flexDirection = 'row';
+            wrapper.style.flexWrap = 'wrap';
+            wrapper.style.justifyContent = 'center';
+        }
+    } else {
+        mainApp.style.display = 'none';
+        guestView.style.display = 'block';
+        userEmailDisp.textContent = 'Guest Mode';
+        authBtn.textContent = 'Login';
+        authBtn.style.color = '#00be39';
+    }
+}
 
         // FUNGSI UTAMA NETLIFY IDENTITY
         const mainApp = document.getElementById('main-app-content');
