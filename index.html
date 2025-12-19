@@ -70,6 +70,10 @@
             margin-bottom: 10px;
         }
 
+        .hidden-welcome {
+            display: none !important;
+        }
+
         .btn-masuk {
             background: #00be39;
             color: #000 !important;
@@ -461,7 +465,7 @@
     <div id="welcome-screen">
         <h1>JOY GENERATOR</h1>
         <p style="color: #888;">Silakan login untuk mengakses alat bantu.</p>
-        <button class="btn-masuk" onclick="netlifyIdentity.open()">
+        <button class="btn-masuk" onclick="bukaLogin()">
             MASUK SEKARANG
         </button>
     </div>
@@ -785,22 +789,36 @@
 
         // Inisialisasi Netlify Identity
         const identity = window.netlifyIdentity;
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const containerWrapper = document.querySelector('.container-wrapper');
+
+        function bukaLogin() {
+            identity.open(); // Membuka kotak login Netlify
+            welcomeScreen.classList.add('hidden-welcome'); // Menyembunyikan tombol 'Masuk Sekarang'
+        }
 
         identity.on('init', user => {
             if (user) {
             // Jika sudah login
-            document.getElementById('welcome-screen').style.display = 'none';
-            document.querySelector('.container-wrapper').style.display = 'flex';
+            welcomeScreen.classList.add('hidden-welcome');
+            containerWrapper.style.display = 'flex';
             document.getElementById('user-info').textContent = `Halo, ${user.user_metadata.full_name || user.email}`;
             } else {
             // Jika belum login
-            document.getElementById('welcome-screen').style.display = 'flex';
-            document.querySelector('.container-wrapper').style.display = 'none';
+            welcomeScreen.classList.remove('hidden-welcome');
+            containerWrapper.style.display = 'none';
+            }
+        });
+
+        identity.on('close', () => {
+            const user = identity.currentUser();
+            if (!user) {
+                welcomeScreen.classList.remove('hidden-welcome');
             }
         });
 
         identity.on('login', user => {
-            location.reload(); // Refresh halaman agar state bersih setelah login
+            location.reload(); 
         });
 
         identity.on('logout', () => {
