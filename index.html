@@ -910,28 +910,42 @@
     }
 }
 
-        // FUNGSI UTAMA NETLIFY IDENTITY
+        // 1. Inisialisasi Elemen
         const mainApp = document.getElementById('main-app-content');
         const guestView = document.getElementById('guest-view');
-        const userEmailDisp = document.getElementById('user-email');
-        const authBtn = document.getElementById('auth-btn');
-        const mainLoginBtn = document.getElementById('main-login-btn');
+        const userEmailDisp = document.getElementById('user-email-display'); // Untuk header profil
+        const userDetail = document.getElementById('user-info-detail');     // Untuk dropdown detail
+        const authBtn = document.getElementById('auth-btn');               // Tombol di dalam dropdown
+        const mainLoginBtn = document.getElementById('main-login-btn');    // Tombol di tengah layar guest
 
-        // Fungsi Update Tampilan
+        // 2. Fungsi Toggle Menu Profil
+        function toggleProfileMenu() {
+            const dropdown = document.getElementById('profile-dropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // 3. Fungsi Update Tampilan (UI)
         function updateUI(user) {
             if (user) {
+                // Tampilkan Aplikasi Utama
                 mainApp.style.display = 'flex';
                 mainApp.style.flexDirection = 'column';
                 mainApp.style.alignItems = 'center';
                 mainApp.style.width = '100%';
-
-                document.body.style.paddingTop = '100px';
-
+        
+                // Sembunyikan Tampilan Guest
                 guestView.style.display = 'none';
-                userEmailDisp.textContent = user.email;
-                authBtn.textContent = 'Logout';
 
-                // Memastikan container-wrapper tetap menggunakan flex row
+                // Update Info Profil di Header
+                const shortName = user.email.split('@')[0];
+                userEmailDisp.textContent = shortName;
+                userDetail.textContent = `Login: ${user.email}`;
+        
+                // Ubah Tombol Dropdown jadi Logout
+                authBtn.textContent = 'Logout';
+                authBtn.style.color = '#ff4d4d';
+
+                // Pastikan Layout Kolom (Generator & Tools) tetap berdampingan
                 const wrapper = document.querySelector('.container-wrapper');
                 if (wrapper) {
                     wrapper.style.display = 'flex';
@@ -940,23 +954,22 @@
                     wrapper.style.justifyContent = 'center';
                 }
 
-                showToast(`Selamat datang, ${user.user_metadata.full_name || user.email.split('@')[0]}`);
-                } else {
-                    mainApp.style.display = 'none';
-                    mainApp.style.marginTop = '0px';
-                    guestView.style.display = 'block';
-                    userEmailDisp.textContent = 'Guest Mode';
-                    authBtn.textContent = 'Login';
-                }
+                showToast(`Selamat datang, ${user.user_metadata?.full_name || shortName}`);
+            } else {
+                // Jika Logout
+                mainApp.style.display = 'none';
+                guestView.style.display = 'block';
+                userEmailDisp.textContent = 'Guest Mode';
+                userDetail.textContent = 'Silakan Login';
+                authBtn.textContent = 'Login';
+                authBtn.style.color = '#00be39';
             }
+        }
 
-        // NETLIFY IDENTITY (NO CUSTOM HTML)
+        // 4. Logika Netlify Identity
         if (window.netlifyIdentity) {
             netlifyIdentity.on("init", user => {
-                if (user) {
-                    showToast(`Login sebagai ${user.email}`);
-                    updateUI(user);
-                }
+                updateUI(user);
             });
 
             netlifyIdentity.on('login', user => {
@@ -969,7 +982,7 @@
                 showToast("Anda telah logout.");
             });
 
-            // Event Klik Tombol
+            // Event Klik Tombol Login/Logout (Di Dropdown)
             authBtn.addEventListener('click', () => {
                 const user = netlifyIdentity.currentUser();
                 if (user) {
@@ -979,17 +992,28 @@
                 }
             });
 
-            mainLoginBtn.addEventListener('click', () => {
-                netlifyIdentity.open();
-            });
+            // Event Klik Tombol Login Utama (Tampilan Tengah)
+            if (mainLoginBtn) {
+                mainLoginBtn.addEventListener('click', () => {
+                    netlifyIdentity.open();
+                });
+            }
         }
 
+        // 5. Penutup Otomatis Dropdown jika klik di luar
+        window.addEventListener('click', (e) => {
+            if (!e.target.closest('.profile-container')) {
+                const dropdown = document.getElementById('profile-dropdown');
+                if (dropdown) dropdown.classList.remove('show');
+            }
+        });
+
+        // 6. Service Worker & Hash Clean
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js');
-                });
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+            });
         }
-
         if (window.location.hash) {
             window.location.hash = '';
         }
