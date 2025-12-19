@@ -382,11 +382,12 @@
 
         /* Gaya Khusus Area Login */
         .auth-header {
-            width: 100%;
-            max-width: 1300px;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: auto;
             display: flex;
             justify-content: flex-end;
-            margin-bottom: 20px;
             z-index: 100;
         }
 
@@ -438,7 +439,6 @@
             justify-content: center;
             gap: 30px;
             width: 100%;
-            max-width: 1300px;
             margin: 20px auto;
         }
 
@@ -812,6 +812,7 @@
                 mainApp.style.flexDirection = 'column';
                 mainApp.style.alignItems = 'center';
                 mainApp.style.width = '100%';
+                mainApp.style.marginTop = '80px';
 
                 guestView.style.display = 'none';
                 userEmailDisp.textContent = user.email;
@@ -829,6 +830,7 @@
                 showToast(`Selamat datang, ${user.user_metadata.full_name || user.email.split('@')[0]}`);
             } else {
                 mainApp.style.display = 'none';
+                mainApp.style.marginTop = '0px';
                 guestView.style.display = 'block';
                 userEmailDisp.textContent = 'Guest Mode';
                 authBtn.textContent = 'Login';
