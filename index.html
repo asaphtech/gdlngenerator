@@ -383,6 +383,7 @@
         /* Sembunyikan aplikasi utama sebelum login */
         #main-app-content {
             display: none;
+            padding-top: 80px;
         }
 
         /* Overlay untuk user yang belum login */
@@ -412,13 +413,13 @@
         }
 
         .header-profile {
-            width: 100%;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
             display: flex;
             justify-content: flex-end;
-            padding: 10px 20px;
-            background: #000;
-            position: relative;
-            z-index: 1001;
+            width: auto;
         }
 
         .profile-container {
@@ -867,9 +868,9 @@
         // 3. Fungsi Utama Update Tampilan
         function updateUI(user) {
             const marquee = document.querySelector('.marquee-container') || document.querySelector('marquee');
-
+            
             if (user) {
-                // JIKA LOGIN BERHASIL
+                // KONDISI LOGIN
                 if (mainApp) {
                     mainApp.style.display = 'block';
                     mainApp.style.opacity = '1';
@@ -877,16 +878,7 @@
                 
                 if (marquee) marquee.style.display = 'block';
 
-                // Rapikan layout alat bantu
-                const wrapper = document.querySelector('.container-wrapper');
-                if (wrapper) {
-                    wrapper.style.display = 'flex';
-                    wrapper.style.flexDirection = 'row';
-                    wrapper.style.flexWrap = 'wrap';
-                    wrapper.style.justifyContent = 'center';
-                }
-
-                // Update teks profil
+                // Update teks di header-profile
                 const shortName = user.email.split('@')[0];
                 if (userEmailDisp) userEmailDisp.textContent = shortName;
                 if (userDetail) userDetail.textContent = user.email;
@@ -894,12 +886,9 @@
                     authBtn.textContent = 'Logout';
                     authBtn.style.color = '#ff4d4d';
                 }
-                showToast(`Halo, ${shortName}!`);
             } else {
-                // JIKA BELUM LOGIN
+                // KONDISI BELUM LOGIN
                 if (mainApp) mainApp.style.display = 'none';
-                
-                // SEMBUNYIKAN MARQUEE agar tidak menabrak popup login
                 if (marquee) marquee.style.display = 'none';
 
                 if (userEmailDisp) userEmailDisp.textContent = 'Belum Login';
@@ -908,6 +897,7 @@
                     authBtn.style.color = '#00be39';
                 }
                 
+                // Popup Netlify muncul tanpa gangguan marquee di tengah
                 if (window.netlifyIdentity) {
                     netlifyIdentity.open();
                 }
