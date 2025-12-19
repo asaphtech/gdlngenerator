@@ -61,6 +61,7 @@
             align-items: center;
             z-index: 10000; /* Angka tertinggi agar selalu di paling depan */
             text-align: center;
+            transition: opacity 0.4s ease; /* Efek halus saat menghilang */
         }
 
         #welcome-screen h1 {
@@ -101,6 +102,10 @@
             flex-direction: column;
             align-items: flex-end;
             z-index: 1000;
+        }
+        
+        .netlify-identity-widget {
+            z-index: 10001 !important;
         }
 
         .main-container, .tools-container {
@@ -471,7 +476,6 @@
     </div>
 
     </div>
-    <div class="container-wrapper">
         <div class="main-container">
             <div class="corner-bottom"></div>
             <div class="corner-bottom-right"></div>
@@ -795,9 +799,9 @@
         function bukaLogin() {
             if (identity) { // Membuka kotak login Netlify
                 identity.open();
+                welcomeScreen.style.opacity = "0";
             } else {
-                console.error("Netlify Identity script belum termuat");
-                alert("Koneksi sedang lambat, tunggu sebentar lalu coba lagi.");
+                alert("Sedang memuat sistem login, tunggu sebentar...");
             }
         }
 
@@ -805,6 +809,7 @@
             welcomeScreen.style.opacity = "0";
             welcomeScreen.style.pointerEvents = "none";
         });
+
         identity.on('close', () => {
             const user = identity.currentUser();
             if (!user) {
@@ -817,6 +822,8 @@
             if (user) {
                 welcomeScreen.style.display = 'none';
                 containerWrapper.style.display = 'flex';
+                const userInfo = document.getElementById('user-info');
+                if(userInfo) userInfo.textContent = `User: ${user.email}`;
                 } else {
                     welcomeScreen.style.display = 'flex';
                     containerWrapper.style.display = 'none';
