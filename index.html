@@ -793,36 +793,42 @@
         const containerWrapper = document.querySelector('.container-wrapper');
 
         function bukaLogin() {
-            identity.open(); // Membuka kotak login Netlify
-            welcomeScreen.classList.add('hidden-welcome'); // Menyembunyikan tombol 'Masuk Sekarang'
+            if (identity) { // Membuka kotak login Netlify
+                identity.open();
+            } else {
+                console.error("Netlify Identity script belum termuat");
+                alert("Koneksi sedang lambat, tunggu sebentar lalu coba lagi.");
+            }
         }
 
-        identity.on('init', user => {
-            if (user) {
-            // Jika sudah login
-            welcomeScreen.classList.add('hidden-welcome');
-            containerWrapper.style.display = 'flex';
-            document.getElementById('user-info').textContent = `Halo, ${user.user_metadata.full_name || user.email}`;
-            } else {
-            // Jika belum login
-            welcomeScreen.classList.remove('hidden-welcome');
-            containerWrapper.style.display = 'none';
-            }
+        identity.on('open', () => {
+            welcomeScreen.style.opacity = "0";
+            welcomeScreen.style.pointerEvents = "none";
         });
-
         identity.on('close', () => {
             const user = identity.currentUser();
             if (!user) {
-                welcomeScreen.classList.remove('hidden-welcome');
-            }
+                welcomeScreen.style.opacity = "1";
+                welcomeScreen.style.pointerEvents = "auto";
+            }    
         });
 
+        identity.on('init', user => {
+            if (user) {
+                welcomeScreen.style.display = 'none';
+                containerWrapper.style.display = 'flex';
+                } else {
+                    welcomeScreen.style.display = 'flex';
+                    containerWrapper.style.display = 'none';
+                }
+            });
+            
         identity.on('login', user => {
-            location.reload(); 
+            location.reload();
         });
 
         identity.on('logout', () => {
-            location.reload(); 
+            location.reload();
         });
 
         if (window.location.hash) {
