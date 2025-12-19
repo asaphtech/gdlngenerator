@@ -382,9 +382,7 @@
 
         /* Sembunyikan aplikasi utama sebelum login */
         #main-app-content {
-            display: none; 
-            width: 100%;
-            max-width: 1300px;
+            display: none;
         }
 
         /* Overlay untuk user yang belum login */
@@ -452,7 +450,9 @@
         }
 
         .dropdown-content.show {
-            display: block;
+            display: block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
         }
 
         .logout-link {
@@ -866,12 +866,16 @@
 
         // 3. Fungsi Utama Update Tampilan
         function updateUI(user) {
+            const marquee = document.querySelector('.marquee-container') || document.querySelector('marquee');
+
             if (user) {
                 // JIKA LOGIN BERHASIL
                 if (mainApp) {
                     mainApp.style.display = 'block';
                     mainApp.style.opacity = '1';
                 }
+                
+                if (marquee) marquee.style.display = 'block';
 
                 // Rapikan layout alat bantu
                 const wrapper = document.querySelector('.container-wrapper');
@@ -890,18 +894,20 @@
                     authBtn.textContent = 'Logout';
                     authBtn.style.color = '#ff4d4d';
                 }
-
                 showToast(`Halo, ${shortName}!`);
             } else {
-                // JIKA BELUM LOGIN / LOGOUT
+                // JIKA BELUM LOGIN
                 if (mainApp) mainApp.style.display = 'none';
+                
+                // SEMBUNYIKAN MARQUEE agar tidak menabrak popup login
+                if (marquee) marquee.style.display = 'none';
+
                 if (userEmailDisp) userEmailDisp.textContent = 'Belum Login';
                 if (authBtn) {
                     authBtn.textContent = 'Login';
                     authBtn.style.color = '#00be39';
                 }
                 
-                // Munculkan popup login secara otomatis
                 if (window.netlifyIdentity) {
                     netlifyIdentity.open();
                 }
@@ -910,9 +916,19 @@
 
         // 4. Integrasi Netlify Identity
         if (window.netlifyIdentity) {
-            // Saat pertama kali halaman dimuat
-            netlifyIdentity.on("init", user => {
-                updateUI(user);
+            netlifyIdentity.on('open', () => {
+                // Sembunyikan marquee saat popup terbuka
+                const marquee = document.querySelector('.marquee-container') || document.querySelector('marquee');
+                if (marquee) marquee.style.display = 'none';
+            });
+
+            netlifyIdentity.on('close', () => {
+                const user = netlifyIdentity.currentUser();
+                if (!user) {
+                    // Jika ditutup tapi belum login, pastikan marquee tetap hilang
+                    const marquee = document.querySelector('.marquee-container') || document.querySelector('marquee');
+                    if (marquee) marquee.style.display = 'none';
+                }
             });
 
             // Saat user berhasil login
