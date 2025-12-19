@@ -476,30 +476,14 @@
 <body>
     <div class="toast" id="toast"></div>
 
-    <div id="guest-view">
-        <div class="main-container" style="max-width: 500px; margin: 100px auto; text-align: center; border: 1px solid #00be39;">
-            <div class="corner-top"></div>
-            <div class="corner-top-right"></div>
-            <div class="corner-bottom"></div>
-            <div class="corner-bottom-right"></div>
-        
-            <h3 style="color: #fff; margin-bottom: 15px;">Selamat Datang di JOY TOOLS</h3>
-            <p style="margin-bottom: 25px; color: #bdbdbd;">Silakan login terlebih dahulu untuk mengakses fitur Generator & OCR.</p>
-        
-            <button id="main-login-btn" class="btn-auth" style="padding: 12px 30px; width: 100%;">
-                KLIK UNTUK LOGIN
-            </button>
-        </div>
-    </div>
-
     <div class="header-profile">
         <div class="profile-container" onclick="toggleProfileMenu()">
-            <span id="user-email-display">Guest Mode</span>
+            <span id="user-email-display">Loading...</span>
             <div class="profile-icon">👤</div>
 
             <div id="profile-dropdown" class="dropdown-content">
-                <p id="user-info-detail"></p>
-                <hr>
+                <p id="user-info-detail" style="font-size: 11px; color: #888;"></p>
+                <hr style="border: 0; border-top: 1px solid #333; margin: 10px 0;">
                 <button id="auth-btn" class="logout-link">Login</button>
             </div>
         </div>
@@ -674,7 +658,6 @@
                 showToast('Harap masukkan User ID!');
                 return;
             }
-
 
             const password = generatePassword();
             const output = `Berikut user id dan password baru Anda Bosku:\nUser ID: ${userId.toLowerCase()}\nPassword: ${password}\n\nSilakan dicoba login bosku.\nNote: Saran kami disimpan pada memo anda dan setelah berhasil login mohon untuk mengganti password anda kembali.`;
@@ -869,40 +852,28 @@
 
         // 1. Inisialisasi Elemen
         const mainApp = document.getElementById('main-app-content');
-        const guestView = document.getElementById('guest-view');
-        const userEmailDisp = document.getElementById('user-email-display'); // Untuk header profil
-        const userDetail = document.getElementById('user-info-detail');     // Untuk dropdown detail
-        const authBtn = document.getElementById('auth-btn');               // Tombol di dalam dropdown
-        const mainLoginBtn = document.getElementById('main-login-btn');    // Tombol di tengah layar guest
+        const userEmailDisp = document.getElementById('user-email-display');
+        const userDetail = document.getElementById('user-info-detail');
+        const authBtn = document.getElementById('auth-btn');
 
         // 2. Fungsi Toggle Menu Profil
         function toggleProfileMenu() {
             const dropdown = document.getElementById('profile-dropdown');
-            dropdown.classList.toggle('show');
+            if (dropdown) {
+                dropdown.classList.toggle('show');
+            }
         }
 
-        // 3. Fungsi Update Tampilan (UI)
+        // 3. Fungsi Utama Update Tampilan
         function updateUI(user) {
             if (user) {
-                // Tampilkan Aplikasi Utama
-                mainApp.style.display = 'flex';
-                mainApp.style.flexDirection = 'column';
-                mainApp.style.alignItems = 'center';
-                mainApp.style.width = '100%';
-        
-                // Sembunyikan Tampilan Guest
-                guestView.style.display = 'none';
+                // JIKA LOGIN BERHASIL
+                if (mainApp) {
+                    mainApp.style.display = 'block';
+                    mainApp.style.opacity = '1';
+                }
 
-                // Update Info Profil di Header
-                const shortName = user.email.split('@')[0];
-                userEmailDisp.textContent = shortName;
-                userDetail.textContent = `Login: ${user.email}`;
-        
-                // Ubah Tombol Dropdown jadi Logout
-                authBtn.textContent = 'Logout';
-                authBtn.style.color = '#ff4d4d';
-
-                // Pastikan Layout Kolom (Generator & Tools) tetap berdampingan
+                // Rapikan layout alat bantu
                 const wrapper = document.querySelector('.container-wrapper');
                 if (wrapper) {
                     wrapper.style.display = 'flex';
@@ -911,68 +882,87 @@
                     wrapper.style.justifyContent = 'center';
                 }
 
-                showToast(`Selamat datang, ${user.user_metadata?.full_name || shortName}`);
+                // Update teks profil
+                const shortName = user.email.split('@')[0];
+                if (userEmailDisp) userEmailDisp.textContent = shortName;
+                if (userDetail) userDetail.textContent = user.email;
+                if (authBtn) {
+                    authBtn.textContent = 'Logout';
+                    authBtn.style.color = '#ff4d4d';
+                }
+
+                showToast(`Halo, ${shortName}!`);
             } else {
-                // Jika Logout
-                mainApp.style.display = 'none';
-                guestView.style.display = 'block';
-                userEmailDisp.textContent = 'Guest Mode';
-                userDetail.textContent = 'Silakan Login';
-                authBtn.textContent = 'Login';
-                authBtn.style.color = '#00be39';
+                // JIKA BELUM LOGIN / LOGOUT
+                if (mainApp) mainApp.style.display = 'none';
+                if (userEmailDisp) userEmailDisp.textContent = 'Belum Login';
+                if (authBtn) {
+                    authBtn.textContent = 'Login';
+                    authBtn.style.color = '#00be39';
+                }
+                
+                // Munculkan popup login secara otomatis
+                if (window.netlifyIdentity) {
+                    netlifyIdentity.open();
+                }
             }
         }
 
-        // 4. Logika Netlify Identity
+        // 4. Integrasi Netlify Identity
         if (window.netlifyIdentity) {
+            // Saat pertama kali halaman dimuat
             netlifyIdentity.on("init", user => {
                 updateUI(user);
             });
 
+            // Saat user berhasil login
             netlifyIdentity.on('login', user => {
                 updateUI(user);
                 netlifyIdentity.close();
             });
 
+            // Saat user logout
             netlifyIdentity.on('logout', () => {
                 updateUI(null);
                 showToast("Anda telah logout.");
             });
 
-            // Event Klik Tombol Login/Logout (Di Dropdown)
-            authBtn.addEventListener('click', () => {
-                const user = netlifyIdentity.currentUser();
-                if (user) {
-                    netlifyIdentity.logout();
-                } else {
-                    netlifyIdentity.open();
-                }
-            });
-
-            // Event Klik Tombol Login Utama (Tampilan Tengah)
-            if (mainLoginBtn) {
-                mainLoginBtn.addEventListener('click', () => {
-                    netlifyIdentity.open();
+            // Event Klik Tombol Logout/Login di menu profil
+            if (authBtn) {
+                authBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const user = netlifyIdentity.currentUser();
+                    if (user) {
+                        netlifyIdentity.logout();
+                    } else {
+                        netlifyIdentity.open();
+                    }
                 });
             }
         }
 
-        // 5. Penutup Otomatis Dropdown jika klik di luar
+        // 5. Tutup dropdown profil jika klik di luar area profil
         window.addEventListener('click', (e) => {
             if (!e.target.closest('.profile-container')) {
                 const dropdown = document.getElementById('profile-dropdown');
-                if (dropdown) dropdown.classList.remove('show');
+                if (dropdown && dropdown.classList.contains('show')) {
+                    dropdown.classList.remove('show');
+                }
             }
         });
 
-        // 6. Service Worker & Hash Clean
+        // 6. Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js').catch(() => {});
             });
         }
+
+        // 7. Bersihkan URL dari Token Netlify
         if (window.location.hash) {
-            window.location.hash = '';
+            if (window.location.hash.indexOf('_token=') === -1) {
+                window.location.hash = '';
+            }
         }
     </script>
     <script src="marquee-config.js"></script>
