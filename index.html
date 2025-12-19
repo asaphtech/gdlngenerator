@@ -380,29 +380,6 @@
             animation: spin 1s ease-in-out infinite;
         }
 
-        /* Gaya Khusus Area Login */
-        .auth-header {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            width: auto;
-            pointer-events: all;
-        }
-
-        #login-status {
-            background: rgba(30, 30, 30, 0.9);
-            padding: 8px 15px;
-            border-radius: 50px;
-            border: 1px solid #00be39;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
         /* Sembunyikan aplikasi utama sebelum login */
         #main-app-content {
             display: none; 
@@ -418,19 +395,6 @@
             padding: 40px;
             border-radius: 20px;
             border: 1px solid #00be39;
-        }
-
-        /* Re-use style tombol Anda untuk Login */
-        .btn-auth {
-            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
-            color: #00be39;
-            padding: 8px 16px;
-            border: 1px solid #555;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            text-transform: uppercase;
-            white-space: nowrap;
         }
 
         .container-wrapper { 
@@ -511,13 +475,6 @@
 </head>
 <body>
     <div class="toast" id="toast"></div>
-
-    <div class="auth-header">
-        <div id="login-status">
-            <span id="user-email">Guest Mode</span>
-            <button id="auth-btn" class="btn-auth">Login</button>
-        </div>
-    </div>
 
     <div id="guest-view">
         <div class="main-container" style="max-width: 500px; margin: 100px auto; text-align: center; border: 1px solid #00be39;">
