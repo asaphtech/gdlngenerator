@@ -612,6 +612,25 @@
         </div>
     </div>
 
+        <div id="guest-view" style="display: none;">
+            <div style="text-align: center; margin-top: 50px; background: rgba(30, 30, 30, 0.95); padding: 40px; border-radius: 20px; border: 1px solid #00be39; max-width: 500px; margin-left: auto; margin-right: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5);"></div>
+            <h2 style="color: #fff; margin-bottom: 10px;">Akses Terbatas</h2>
+            <p style="color: #bdbdbd; margin-bottom: 25px;">Aplikasi ini hanya untuk pengguna terundang. Silakan login atau ajukan akses di bawah ini.</p>
+
+            <button onclick="netlifyIdentity.open()" class="tool-nav-btn" style="width: 100%; margin-bottom: 30px;">Login Sekarang</button>
+            
+            <div style="border-top: 1px solid #444; margin-top: 20px; padding-top: 20px;">
+                <p style="color: #fff; font-size: 14px; margin-bottom: 15px;">Belum punya undangan? Request di sini:</p>
+                <form name="request-invite" method="POST" data-netlify="true">
+                    <input type="hidden" name="form-name" value="request-invite" />
+                    <input type="email" name="email" placeholder="Masukkan Email Anda" required
+                        style="width: 100%; padding: 12px; background: #1a1a1a; border: 1px solid #444; color: white; border-radius: 8px; margin-bottom: 10px;">
+                    <button type="submit" class="tool-nav-btn" style="width: 100%; font-size: 12px; background: #222;">Kirim Permintaan Akses</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Utility Functions (DIPERLUKAN OLEH marquee-config.js)
         function showToast(msg, duration = 3000) {
@@ -881,92 +900,102 @@
     }
 }
 
-        // 1. Inisialisasi Elemen
-        const mainApp = document.getElementById('main-app-content');
-        const userEmailDisp = document.getElementById('user-email-display');
-        const userDetail = document.getElementById('user-info-detail');
-        const authBtn = document.getElementById('auth-btn');
+        // 1. Inisialisasi Elemen Utama
+            const mainApp = document.getElementById('main-app-content');
+            const guestView = document.getElementById('guest-view'); // Elemen Request Invite
+            const userEmailDisp = document.getElementById('user-email-display');
+            const userDetail = document.getElementById('user-info-detail');
+            const authBtn = document.getElementById('auth-btn');
 
-        // 2. Fungsi Toggle Menu Profil
-        function toggleProfileMenu() {
-            const dropdown = document.getElementById('profile-dropdown');
-            if (dropdown) dropdown.classList.toggle('show');
-        }
-
-        // 3. Fungsi Utama Update Tampilan
-        function updateUI(user) {
-            const marquee = document.querySelector('.marquee-container') || document.querySelector('marquee');
-
-            if (user) {
-                // JIKA USER LOGIN
-                if (mainApp) mainApp.style.display = 'block';
-                if (marquee) marquee.style.display = 'block';
-
-                // Update teks header
-                const shortName = user.email.split('@')[0];
-                if (userEmailDisp) userEmailDisp.textContent = shortName;
-                if (userDetail) userDetail.textContent = user.email;
-                if (authBtn) {
-                    authBtn.textContent = 'Logout';
-                    authBtn.style.color = '#ff4d4d';
-                }
-                
-                // Pastikan layout kontainer rapi
-                const wrapper = document.querySelector('.container-wrapper');
-                if (wrapper) {
-                    wrapper.style.display = 'flex';
-                    wrapper.style.justifyContent = 'center';
-                }
-            } else {
-                // JIKA USER BELUM LOGIN
-                if (mainApp) mainApp.style.display = 'none';
-                
-                // Sembunyikan marquee agar tidak menabrak popup login
-                if (marquee) marquee.style.display = 'none';
-
-                if (userEmailDisp) userEmailDisp.textContent = 'Belum Login';
-                if (authBtn) {
-                    authBtn.textContent = 'Login';
-                    authBtn.style.color = '#00be39';
-                }
-                
-                // Buka popup login secara otomatis
-                if (window.netlifyIdentity) netlifyIdentity.open();
-            }
-        }
-
-        // 4. Integrasi Netlify Identity
-        if (window.netlifyIdentity) {
-            netlifyIdentity.on("init", user => updateUI(user));
-            netlifyIdentity.on('login', user => {
-                updateUI(user);
-                netlifyIdentity.close();
-            });
-            netlifyIdentity.on('logout', () => updateUI(null));
-
-            authBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                if (netlifyIdentity.currentUser()) {
-                    netlifyIdentity.logout();
-                } else {
-                    netlifyIdentity.open();
-                }
-            });
-        }
-
-        // 5. Tutup dropdown profil jika klik di luar
-        window.addEventListener('click', (e) => {
-            if (!e.target.closest('.profile-container')) {
+            // 2. Fungsi Toggle Menu Profil
+            function toggleProfileMenu() {
                 const dropdown = document.getElementById('profile-dropdown');
-                if (dropdown) dropdown.classList.remove('show');
+                if (dropdown) dropdown.classList.toggle('show');
             }
-        });
 
-        // 6. Pembersihan Hash Token Netlify
-        if (window.location.hash && window.location.hash.indexOf('_token=') === -1) {
-            window.location.hash = '';
-        }
-    </script>
+            // 3. Fungsi Utama Update Tampilan (Logika Login/Logout)
+            function updateUI(user) {
+                const marquee = document.querySelector('.marquee-container') || document.querySelector('marquee');
+
+                if (user) {
+                    // KONDISI: USER SUDAH LOGIN
+                    if (mainApp) mainApp.style.display = 'block';
+                    if (guestView) guestView.style.display = 'none'; // Sembunyikan form request
+                    if (marquee) marquee.style.display = 'block';
+
+                    // Update Informasi Header
+                    const shortName = user.email.split('@')[0];
+                    if (userEmailDisp) userEmailDisp.textContent = shortName;
+                    if (userDetail) userDetail.textContent = user.email;
+                    
+                    if (authBtn) {
+                        authBtn.textContent = 'Logout';
+                        authBtn.style.color = '#ff4d4d';
+                    }
+                } else {
+                    // KONDISI: USER BELUM LOGIN (GUEST)
+                    if (mainApp) mainApp.style.display = 'none';
+                    if (guestView) guestView.style.display = 'block'; // Tampilkan form request
+                    if (marquee) marquee.style.display = 'none';
+
+                    if (userEmailDisp) userEmailDisp.textContent = 'Belum Login';
+                    if (authBtn) {
+                        authBtn.textContent = 'Login';
+                        authBtn.style.color = '#00be39';
+                    }
+                }
+            }
+
+            // 4. Integrasi Netlify Identity
+            if (window.netlifyIdentity) {
+                // Cek status login saat halaman pertama kali dimuat
+                netlifyIdentity.on("init", user => updateUI(user));
+
+                // Event saat berhasil login
+                netlifyIdentity.on('login', user => {
+                    updateUI(user);
+                    netlifyIdentity.close(); // Tutup popup otomatis
+                });
+
+                // Event saat logout
+                netlifyIdentity.on('logout', () => updateUI(null));
+
+                // Listener tombol Login/Logout di header
+                authBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (netlifyIdentity.currentUser()) {
+                        netlifyIdentity.logout();
+                    } else {
+                        netlifyIdentity.open();
+                    }
+                });
+            }
+
+            // 5. Interaksi Dropdown & Klik Luar
+            window.addEventListener('click', (e) => {
+                // Tutup dropdown jika klik di luar area profil
+                if (!e.target.closest('.profile-container')) {
+                    const dropdown = document.getElementById('profile-dropdown');
+                    if (dropdown && dropdown.classList.contains('show')) {
+                        dropdown.classList.remove('show');
+                    }
+                }
+            });
+
+            // 6. Handle Form Request Invite (Hanya untuk Alert)
+            const requestForm = document.querySelector('form[name="request-invite"]');
+            if (requestForm) {
+                requestForm.addEventListener("submit", () => {
+                    // Pesan ini akan muncul tepat sebelum form dikirim ke Netlify
+                    alert("Terima kasih! Permintaan akses Anda telah dikirim. Silakan cek email secara berkala.");
+                });
+            }
+
+            // 7. Bersihkan URL dari Token Netlify (Agar URL tetap rapi)
+            if (window.location.hash && window.location.hash.indexOf('_token=') === -1) {
+                window.location.hash = '';
+            }
+        </script>
     <script src="marquee-config.js"></script>
 </body>
 </html>
