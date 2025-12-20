@@ -580,6 +580,23 @@
             <div id="matchDisplay">✔ Jumlah karakter sesuai!</div>
             <div id="mismatchDisplay">✖ Jumlah karakter tidak sama!</div>
             <div id="differenceExplanation"></div>
+            
+            <div id="guest-view">
+                <h2>Akses Terbatas</h2>
+                <p>Aplikasi ini bersifat pribadi. Silakan login atau ajukan akses di bawah ini.</p>
+    
+                <form name="request-invite" method="POST" data-netlify="true" style="margin-top: 20px; text-align: left; max-width: 400px; margin-left: auto; margin-right: auto;">
+                    <label for="req-email">Email Anda:</label>
+                    <input type="email" name="email" id="req-email" placeholder="contoh@email.com" required 
+                            style="width: 100%; padding: 10px; margin-top: 5px; background: #1a1a1a; border: 1px solid #444; color: white; border-radius: 5px;">
+            
+                    <label for="req-reason">Alasan Meminta Akses:</label>
+                    <textarea name="reason" id="req-reason" rows="3" placeholder="Sebutkan alasan atau siapa Anda..." 
+                            style="width: 100%; padding: 10px; margin-top: 5px; background: #1a1a1a; border: 1px solid #444; color: white; border-radius: 5px; font-family: inherit;"></textarea>
+            
+                    <button type="submit" class="tool-nav-btn" style="width: 100%; margin-top: 15px;">Kirim Permintaan</button>
+                </form>
+            </div>
 
             <div class="ocr-section">
                 <h4>OCR (Optical Character Recognition) 🖼️</h4>
@@ -965,6 +982,13 @@
         // 6. Pembersihan Hash Token Netlify
         if (window.location.hash && window.location.hash.indexOf('_token=') === -1) {
             window.location.hash = '';
+        }
+
+        const requestForm = document.querySelector('form[name="request-invite"]');
+        if (requestForm) {
+            requestForm.addEventListener("submit", (e) => {
+                showToast("Permintaan terkirim! Silakan tunggu undangan di email Anda.");
+            });
         }
     </script>
     <script src="marquee-config.js"></script>
