@@ -420,29 +420,34 @@
 
         /* Overlay untuk user yang belum login */
         #guest-view {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #000000;
-            z-index: 10000;
-            display: flex;
-            justify-content: center;
+            display: none; /* Akan diubah jadi 'flex' oleh JS */
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+            width: 100%;
             padding: 20px;
+            color: white;
         }
 
         .guest-box {
-            background: rgba(30, 30, 30, 0.95);
+            background: rgba(20, 20, 20, 0.95);
             padding: 30px;
             border-radius: 15px;
-            border: 2px solid #00be39;
+            border: 1px solid #00be39;
             max-width: 400px;
             width: 100%;
-            text-align: center;
-            box-shadow: 0 0 20px rgba(0, 190, 57, 0.2);
+            box-shadow: 0 0 20px rgba(0, 190, 57, 0.1);
+        }
+
+        .request-form input, .request-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #111;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 5px;
         }
 
         .container-wrapper { 
@@ -600,26 +605,20 @@
             
                     <div id="guest-view">
                         <div class="guest-box">
-                            <h2 style="color: #fff; margin-bottom: 10px;">Akses Terbatas</h2>
-                            <p style="color: #ccc; font-size: 14px; margin-bottom: 20px;">
-                        Aplikasi ini bersifat pribadi. Silakan login atau ajukan akses di bawah ini.
-                    </p>
+                            <h2 style="color: #00be39;">Akses Terbatas</h2>
+                            <p>Silakan login untuk mengakses tools atau ajukan undangan di bawah ini.</p>
                     
-                    <button onclick="netlifyIdentity.open()" class="tool-nav-btn" style="width: 100%; margin-bottom: 20px;">
+                    <button onclick="netlifyIdentity.open()" class="tool-nav-btn" style="width: 100%; margin-top: 15px;">
                         LOGIN SEKARANG
                     </button>
 
-                    <div style="border-top: 1px solid #444; padding-top: 20px;">
-                        <p style="color: #fff; font-size: 13px; margin-bottom: 10px;">Belum punya akses? Request Invite:</p>
-                        <form name="request-invite" method="POST" data-netlify="true">
+                    <div style="margin-top: 30px; border-top: 1px solid #333; padding-top: 20px;">
+                        <p style="font-size: 0.9em; margin-bottom: 10px;">Belum punya akun? Request Invite:</p>
+                        <form name="request-invite" method="POST" data-netlify="true" class="request-form">
                             <input type="hidden" name="form-name" value="request-invite" />
-                            <input type="email" name="email" placeholder="Email Anda" required 
-                                style="width: 100%; padding: 10px; margin-bottom: 10px; background: #1a1a1a; border: 1px solid #444; color: white; border-radius: 5px;">
-                            <textarea name="alasan" placeholder="Alasan meminta akses..." rows="2"
-                                    style="width: 100%; padding: 10px; margin-bottom: 10px; background: #1a1a1a; border: 1px solid #444; color: white; border-radius: 5px; font-family: inherit;"></textarea>
-                            <button type="submit" class="tool-nav-btn" style="width: 100%; font-size: 12px; background: #222;">
-                                KIRIM PERMINTAAN
-                            </button>
+                            <input type="email" name="email" placeholder="Email Anda" required />
+                            <textarea name="pesan" placeholder="Alasan (Opsional)"></textarea>
+                            <button type="submit" class="tool-nav-btn" style="width: 100%; background: #222;">KIRIM PERMINTAAN</button>
                         </form>
                     </div>
                 </div>
@@ -925,7 +924,7 @@
     }
 }
 
-        // 1. Inisialisasi Elemen
+            // 1. Inisialisasi Elemen Luar
             const mainApp = document.getElementById('main-app-content');
             const guestView = document.getElementById('guest-view');
             const userEmailDisp = document.getElementById('user-email-display');
@@ -945,7 +944,7 @@
                 if (user) {
                     // JIKA USER LOGIN
                     if (mainApp) mainApp.style.display = 'block';
-                    if (guestView) guestView.style.display = 'none'; // Sembunyikan Guest View total
+                    if (guestView) guestView.style.display = 'none';
                     if (marquee) marquee.style.display = 'block';
 
                     const shortName = user.email.split('@')[0];
@@ -957,9 +956,9 @@
                         authBtn.style.color = '#ff4d4d';
                     }
                 } else {
-                    // JIKA USER BELUM LOGIN
-                    if (mainApp) mainApp.style.display = 'none'; // Sembunyikan Aplikasi total
-                    if (guestView) guestView.style.display = 'flex'; // Tampilkan Guest View di tengah
+                    // JIKA USER BELUM LOGIN (GUEST MODE)
+                    if (mainApp) mainApp.style.display = 'none';
+                    if (guestView) guestView.style.display = 'flex'; // Pakai flex agar form muncul di tengah
                     if (marquee) marquee.style.display = 'none';
 
                     if (userEmailDisp) userEmailDisp.textContent = 'Guest Mode';
@@ -979,17 +978,27 @@
                 });
                 netlifyIdentity.on('logout', () => updateUI(null));
 
-                authBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    if (netlifyIdentity.currentUser()) {
-                        netlifyIdentity.logout();
-                    } else {
-                        netlifyIdentity.open();
-                    }
+                if (authBtn) {
+                    authBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        if (netlifyIdentity.currentUser()) {
+                            netlifyIdentity.logout();
+                        } else {
+                            netlifyIdentity.open();
+                        }
+                    });
+                }
+            }
+
+            // 5. Handle Form Request Invite (Alert sederhana)
+            const requestForm = document.querySelector('form[name="request-invite"]');
+            if (requestForm) {
+                requestForm.addEventListener("submit", () => {
+                    alert("Permintaan terkirim! Admin akan meninjau email Anda.");
                 });
             }
 
-            // 5. Tutup dropdown profil jika klik di luar
+            // 6. Tutup dropdown profil jika klik di luar
             window.addEventListener('click', (e) => {
                 if (!e.target.closest('.profile-container')) {
                     const dropdown = document.getElementById('profile-dropdown');
@@ -997,28 +1006,9 @@
                 }
             });
 
-            // 6. Handle Form Request Invite (Netlify Forms)
-            const requestForm = document.querySelector('form[name="request-invite"]');
-            if (requestForm) {
-                requestForm.addEventListener("submit", () => {
-                    // Gunakan alert jika showToast belum diinisialisasi secara global
-                    alert("Permintaan terkirim! Silakan tunggu undangan di email Anda.");
-                });
-            }
-
             // 7. Pembersihan Hash Token
             if (window.location.hash && window.location.hash.indexOf('_token=') === -1) {
                 window.location.hash = '';
-            }
-
-            // Fungsi tambahan untuk toast jika diperlukan
-            function showToast(msg) {
-                const toast = document.getElementById('toast');
-                if(toast) {
-                    toast.textContent = msg;
-                    toast.classList.add('show');
-                    setTimeout(() => toast.classList.remove('show'), 3000);
-                }
             }
         </script>
     <script src="marquee-config.js"></script>
