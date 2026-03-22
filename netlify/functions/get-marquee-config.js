@@ -1,37 +1,47 @@
-// netlify/functions/get-marquee-config.js
-
 const fetch = require('node-fetch');
 
-// PASTI URL RAW GIST Anda di sini!
-const GIST_RAW_URL = 'https://gist.githubusercontent.com/asaphtech/7b27d3a606a1c732c47874772211b822/raw/130d76d96dfd242469838f983de24b759f949ba5/config.json'; 
+exports.handler = async (event, context) => {
+  // Netlify akan otomatis membaca variabel yang Anda masukkan tadi
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_KEY;
 
-exports.handler = async (event) => {
-    try {
-        const response = await fetch(GIST_RAW_URL);
-        
-        if (!response.ok) {
-            return {
-                statusCode: 500,
-                body: JSON.stringify({ marqueeText: "ERROR: Gagal Status " + response.status })
-            };
+  try {
+    // Mengambil data dari tabel app_config di Supabase berdasarkan key 'marquee_text'
+    const response = await fetch(
+      `${supabaseUrl}/rest/v1/app_config?key=eq.marquee_text&select=value`,
+      {
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json'
         }
-        
-        const data = await response.json();
-        
-        return {
-            statusCode: 200,
-            body: JSON.stringify({
-                marqueeText: data.marqueeText || "DEFAULT: JSON GAGAL",
-            }),
-            headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            }
-        };
-    } catch (error) {
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ marqueeText: "ERROR: Server Runtime" })
-        };
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Supabase error: ${response.statusText}`);
     }
+
+    const data = await response.json();
+    
+    // Ambil nilai dari kolom 'value'. Jika tabel kosong, pakai pesan default.
+    const marqueeText = (data && data.length > 0) 
+      ? data[0].value 
+      : "Selamat Datang! (Pesan default)";
+
+    return {
+      statusCode: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*" // Agar bisa diakses dari frontend
+      },
+      body: JSON.stringify({ marqueeText }),
+    };
+  } catch (error) {
+    console.error("Error:", error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ marqueeText: "⚠️ Gagal memuat pesan dari database." }),
+    };
+  }
 };
